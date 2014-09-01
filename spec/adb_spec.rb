@@ -164,19 +164,19 @@ _______________________________________________________
 
     describe '.execute_with_timeout_and_retry' do
       it 'If the command takes too long then the command should retry then fail' do
-        stub_const('DeviceAPI::Android::ADB::ADB_COMMAND_TIMEOUT',1)
-        stub_const('DeviceAPI::Android::ADB::ADB_COMMAND_RETRIES',5)
+        stub_const('DeviceAPI::Execution::COMMAND_TIMEOUT',1)
+        stub_const('DeviceAPI::Execution::COMMAND_RETRIES',5)
         sleep_time = 5
         cmd = "sleep #{sleep_time.to_s}"
-        expect { DeviceAPI::Android::ADB.execute_with_timeout_and_retry(cmd) }.to raise_error(DeviceAPI::Android::ADBCommandTimeoutError)
+        expect { DeviceAPI::Execution.execute_with_timeout_and_retry(cmd) }.to raise_error(DeviceAPI::CommandTimeoutError)
       end
 
       it 'If the command takes less time than the timeout to execute then the command should pass' do
-        stub_const('DeviceAPI::Android::ADB::ADB_COMMAND_TIMEOUT',2)
-        stub_const('DeviceAPI::Android::ADB::ADB_COMMAND_RETRIES',5)
+        stub_const('DeviceAPI::Execution::COMMAND_TIMEOUT',2)
+        stub_const('DeviceAPI::Execution::COMMAND_RETRIES',5)
         sleep_time = 1
         cmd = "sleep #{sleep_time.to_s}"
-        DeviceAPI::Android::ADB.execute_with_timeout_and_retry(cmd)
+        DeviceAPI::Execution.execute_with_timeout_and_retry(cmd)
       end
 
     end

@@ -1,9 +1,7 @@
-$LOAD_PATH.unshift('./lib/')
-
-require 'device_api/android/device/android'
+require 'device_api/android/device'
 include RSpec
 
-describe DeviceAPI::Android::Device::Android do
+describe DeviceAPI::Android::Device do
 
   ProcessStatusStub = Struct.new(:exitstatus)
   $STATUS_ZERO = ProcessStatusStub.new(0)
@@ -11,7 +9,7 @@ describe DeviceAPI::Android::Device::Android do
     describe '.model' do
 
       it 'Returns model name' do
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 
         allow(Open3).to receive(:capture3) { ['[ro.product.model]: [HTC One]\n', '', $STATUS_ZERO] }
         expect(device.model).to eq('HTC One')
@@ -21,7 +19,7 @@ describe DeviceAPI::Android::Device::Android do
 
     describe '.orientation' do
       it 'Returns portrait when device is portrait' do
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 0\r\n", '', $STATUS_ZERO] }
 
         expect(device.orientation).
@@ -29,7 +27,7 @@ describe DeviceAPI::Android::Device::Android do
       end
 
       it 'Returns landscape when device is landscape' do
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 1\r\n", '', $STATUS_ZERO] }
 
         expect(device.orientation).
@@ -37,7 +35,7 @@ describe DeviceAPI::Android::Device::Android do
       end
 
       it 'Returns an error if response not understood' do
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 
         allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 564654654\n", '', $STATUS_ZERO] }
 
@@ -46,7 +44,7 @@ describe DeviceAPI::Android::Device::Android do
       end
 
       it 'Returns an error if no device found' do
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 
         allow(Open3).to receive(:capture3) { ["error: device not found\n", '', $STATUS_ZERO] }
 
@@ -55,7 +53,7 @@ describe DeviceAPI::Android::Device::Android do
       end
 
       it 'Can handle device orientation changes during a test' do
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         landscape = "SurfaceOrientation: 1\r\n"
         portrait = "SurfaceOrientation: 0\r\n"
 
@@ -82,7 +80,7 @@ logicalFrame=[0, 0, 768, 1280], physicalFrame=[0, 0, 768, 1280], deviceSize=[768
  Translation and Scaling Factors:\r\n        XTranslate: 0.000\r\n        YTranslate: 0.000\r\n        XScale: 0.500\r\n
      YScale: 0.500\r\n        XPrecision: 2.000\r\n        YPrecision: 2.000\r\n
 _______________________________________________________
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
 
         expect(device.orientation).
@@ -101,7 +99,7 @@ _______________________________________________________
       Success
 _______________________________________________________
 
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
         expect(device.install('some_apk.spk')).
             to eq(:success)
@@ -110,7 +108,7 @@ _______________________________________________________
       it 'Can display an error when the apk is not found' do
         out = "can't find 'fake.apk' to install"
 
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
         expect { device.install('fake.apk') }.
             to raise_error(StandardError, "can't find 'fake.apk' to install")
@@ -119,7 +117,7 @@ _______________________________________________________
       it 'Can display an error message when no apk is specified' do
         out = 'No apk specified.'
 
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
         expect { device.install('fake.apk') }.
             to raise_error(StandardError, 'No apk specified.')
@@ -128,7 +126,7 @@ _______________________________________________________
       it 'Can display an error when the apk is already installed' do
         out = 'Failure [INSTALL_FAILED_ALREADY_EXISTS]'
 
-        device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
         allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
         expect { device.install('fake.apk') }.
             to raise_error(StandardError, 'Failure [INSTALL_FAILED_ALREADY_EXISTS]')
@@ -139,7 +137,7 @@ _______________________________________________________
         it 'Can uninstall an apk' do
           out = 'Success'
 
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect(device.uninstall('pack_name')).
               to eq(:success)
@@ -148,7 +146,7 @@ _______________________________________________________
         it 'Can raise an error if the uninstall was unsuccessful' do
           out = 'Failure'
 
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect { device.uninstall('pack_name') }.
               to raise_error(StandardError, "Unable to install 'package_name' Error Reported: Failure")
@@ -161,14 +159,14 @@ _______________________________________________________
 
         it 'Can get the package name from an apk' do
 
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect(device.package_name('iplayer.apk')).
             to eq('bbc.iplayer.android')
         end
 
         it 'Can get the version number from an apk' do
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect(device.app_version_number('iplayer.apk')).
               to eq('4.2.0.66')
@@ -177,7 +175,7 @@ _______________________________________________________
         it 'can raise an error if the app package name is not found' do
           out = "package: versionCode='4200066' versionName='4.2.0.66'"
 
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect { device.package_name('iplayer.apk') }.
               to raise_error(StandardError, 'Package name not found')
@@ -186,7 +184,7 @@ _______________________________________________________
         it 'can raise an error if the app version number is not found' do
           out = "package: name='bbc.iplayer.android' yyyyy='xxxxxxxx' qqqqq='rrrrrrrr'"
 
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect { device.app_version_number('iplayer.apk') }.
               to raise_error(StandardError, 'Version number not found')
@@ -195,7 +193,7 @@ _______________________________________________________
         it 'can raise an error if aapt can not be found' do
           out = 'No such file or directory'
 
-          device = DeviceAPI::Android::Device::Android.new(serial: 'SH34RW905290')
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect { device.app_version_number('iplayer.apk') }.
               to raise_error(StandardError, 'aapt not found place a copy in $ANDROID_HOME/tools')

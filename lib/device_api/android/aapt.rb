@@ -1,21 +1,21 @@
 # Encoding: utf-8
 require 'open3'
 require 'ostruct'
-require 'device_api/execute_cmd'
+require 'device_api/execution'
 
 module DeviceAPI
   module Android
     # Namespace for all methods encapsulating aapt calls
-    class AAPT < Execute
+    class AAPT < DeviceAPI::Execution
 
       def self.aapt_available?
-        result = DeviceAPI::Execute.execute('aapt')
+        result = execute('aapt')
         fail StandardError, 'aapt not found place a copy in $ANDROID_HOME/tools' if result.stdout.include?('No such file or directory')
       end
 
       def self.get_app_props(apk)
         aapt_available?
-        result = DeviceAPI::Execute.execute("aapt dump badging #{apk}")
+        result = execute("aapt dump badging #{apk}")
 
         fail result.stderr if result.exit != 0
 
