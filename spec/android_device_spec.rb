@@ -1,4 +1,4 @@
-require 'device_api/android/connected'
+require 'device_api/android'
 include RSpec
 
 describe DeviceAPI::Android do
@@ -10,11 +10,11 @@ describe DeviceAPI::Android do
 
     it 'Returns an empty array when no devices are connected' do
       out = <<_______________________________________________________
-    List of devices attached
+    List of devices attache§d
 
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
-      expect(DeviceAPI::Android::Connected.devices).to eq([])
+      expect(DeviceAPI::Android.devices).to eq([])
     end
 
     it "returns an array with a single item when there's one device attached" do
@@ -25,7 +25,7 @@ _______________________________________________________
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
 
-      devices = DeviceAPI::Android::Connected.devices
+      devices = DeviceAPI::Android.devices
 
       expect(devices.count).to eq(1)
       expect(devices[0]).to be_a DeviceAPI::Android::Device
@@ -42,7 +42,7 @@ _______________________________________________________
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
 
-      device = DeviceAPI::Android::Connected.device('SH34RW905290')
+      device = DeviceAPI::Android.device('SH34RW905290')
       expect(device).to be_a DeviceAPI::Android::Device
       expect(device.serial).to eq('SH34RW905290')
       expect(device.status).to eq(:ok)

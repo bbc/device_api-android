@@ -1,9 +1,10 @@
 PATH
-  remote: /opt/devicehive/device_api
+  remote: ../device_api
   specs:
     device_api (0.1.3)
 
 GEM
+  remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
     rspec (3.0.0)
