@@ -5,7 +5,6 @@ require 'device_api/execution'
 
 module DeviceAPI
   module Android
-    # Namespace for all methods encapsulating aapt calls
     class AAPT < DeviceAPI::Execution
 
       def self.aapt_available?
