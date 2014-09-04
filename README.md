@@ -10,7 +10,7 @@ Quick Setup
 
 Initialise
 ---------
-require 'device_api/android'
+require 'device_api/android/connected'
 
 device = DeviceAPI::Android::Connected.devices
 
