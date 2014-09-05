@@ -1,4 +1,6 @@
-gem 'device_api', :path => "/opt/devicehive/device_api/"
+source 'https://rubygems.org'
+
+gem 'device_api', '>=1.0.0'
 
 group :test do
   gem 'rspec'
