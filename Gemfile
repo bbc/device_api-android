@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'device_api', :path => "../device_api"
+gem 'device_api', '>=1.0.0'
 
 group :test do
   gem 'rspec'

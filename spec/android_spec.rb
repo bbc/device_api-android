@@ -3,9 +3,6 @@ include RSpec
 
 describe DeviceAPI::Android::Device do
 
-  ProcessStatusStub = Struct.new(:exitstatus)
-  $STATUS_ZERO = ProcessStatusStub.new(0)
-
     describe '.model' do
 
       it 'Returns model name' do

@@ -5,12 +5,9 @@ describe DeviceAPI::Android do
 
   describe '.devices' do
 
-    ProcessStatusStub = Struct.new(:exitstatus)
-    $STATUS_ZERO = ProcessStatusStub.new(0)
-
     it 'Returns an empty array when no devices are connected' do
       out = <<_______________________________________________________
-    List of devices attache§d
+    List of devices attached
 
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }

@@ -5,37 +5,10 @@ require 'device_api/android/adb'
 
 include RSpec
 
-ProcessStatusStub = Struct.new(:exitstatus)
-$STATUS_ZERO = ProcessStatusStub.new(0)
-
-describe DeviceAPI::Android::ADB do
-  describe '.execute' do
-
-    before(:all) do
-      @result = DeviceAPI::Android::ADB.execute('echo boo')
-    end
-
-    it 'returns an OpenStruct execution result' do
-      expect(@result).to be_a OpenStruct
-    end
-
-    it 'captures exit value in hash' do
-      expect(@result.exit).to eq(0)
-    end
-
-    it 'captures stdout in hash' do
-      expect(@result.stdout).to eq("boo\n")
-    end
-
-    it 'capture stderr in hash' do
-      expect(@result.stderr).to eq('')
-    end
-
-  end
-
 #
 #
 # FIRST
+describe DeviceAPI::Android::ADB do
   describe '.devices' do
 
     it 'returns an empty array when there are no devices' do
@@ -161,24 +134,5 @@ _______________________________________________________
       expect( DeviceAPI::Android::ADB.monkey( '1234323', :events => 5000, :package => 'my.app.package' )).to be_a OpenStruct
     end
   end
-
-    describe '.execute_with_timeout_and_retry' do
-      it 'If the command takes too long then the command should retry then fail' do
-        stub_const('DeviceAPI::Execution::COMMAND_TIMEOUT',1)
-        stub_const('DeviceAPI::Execution::COMMAND_RETRIES',5)
-        sleep_time = 5
-        cmd = "sleep #{sleep_time.to_s}"
-        expect { DeviceAPI::Execution.execute_with_timeout_and_retry(cmd) }.to raise_error(DeviceAPI::CommandTimeoutError)
-      end
-
-      it 'If the command takes less time than the timeout to execute then the command should pass' do
-        stub_const('DeviceAPI::Execution::COMMAND_TIMEOUT',2)
-        stub_const('DeviceAPI::Execution::COMMAND_RETRIES',5)
-        sleep_time = 1
-        cmd = "sleep #{sleep_time.to_s}"
-        DeviceAPI::Execution.execute_with_timeout_and_retry(cmd)
-      end
-
-    end
 
 end
