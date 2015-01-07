@@ -60,3 +60,36 @@ device.orientation # :landscape / :portrait
 
 device_api-android is defended with unit and integration level rspec tests. You can run the tests with:
     bundle exec rspec
+
+## Issues
+
+If you plug in a device and adb shows the device as having no permissions as seen here:
+
+            hive@hive-04:~$ adb devices
+            List of devices attached
+            ????????????	no permissions
+
+This is caused by the current user not having permission to access the USB interface. To resolve this, copy the 51-android.rules file to the /etc/udev/rules.d/ directory and restart adb by using the folliowing command
+
+            adb kill-server
+            adb start-server
+
+If, after copying the rules file to the correct location, you're still seeing the no permission message it may be due to the fact that the device does not have a rule setup for it. To add a new rule, type:
+
+            lsusb
+
+You should be presented with something similar to this:
+
+            Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+            Bus 001 Device 020: ID 0e79:5009 Archos, Inc.
+            Bus 001 Device 003: ID 05ac:8242 Apple, Inc. Built-in IR Receiver
+            Bus 001 Device 006: ID 05ac:8289 Apple, Inc.
+            Bus 001 Device 002: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0 Hub (part of BCM2046 Bluetooth)
+            Bus 001 Device 011: ID 05c6:6765 Qualcomm, Inc.
+            Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+            
+The important thing to note here is the Vendor ID and Product ID for the device. In the case of the above, the device is a Tesco Hudl (showing as an Archos device) with the combinded ID of 0e79:5009 - 0e79 is the Vendor ID while 5009 is the Product ID. Open the 51-android.rules file and add the following line:
+
+            SUBSYSTEM=="usb", ATTR{idVendor}=="0e79", ATTR{idProduct}=="5009", MODE="0666", OWNER="hive"
+
+Change the Vendor and Product IDs where appropriate, also check that the owner matches the name of the account that will be running the Hive.
