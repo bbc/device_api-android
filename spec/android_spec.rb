@@ -31,6 +31,14 @@ describe DeviceAPI::Android::Device do
             to eq(:landscape)
       end
 
+      it 'Returns landscape when device is landscape for a kindle Fire' do
+        device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
+        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 3\r\n", '', $STATUS_ZERO] }
+
+        expect(device.orientation).
+            to eq(:landscape)
+      end
+
       it 'Returns an error if response not understood' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 

@@ -29,7 +29,7 @@ module DeviceAPI
         case res
           when '0'
             :portrait
-          when '1'
+          when '1', '3'
             :landscape
           when nil
             fail StandardError, 'No output returned is there a device connected?', caller
