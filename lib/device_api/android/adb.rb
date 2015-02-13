@@ -13,7 +13,6 @@ module DeviceAPI
       # DeviceAPI::ADB.devices #=> { '1232132' => 'device' }
 
 
-
       def self.devices
         result = execute_with_timeout_and_retry('adb devices')
 
@@ -135,7 +134,19 @@ module DeviceAPI
         cmd = cmd + " -s #{seed}" if seed
         cmd = cmd + " -t #{throttle}" if throttle
 
-        result = execute(cmd)
+        execute(cmd)
+      end
+      
+      # Take a screenshot from the device
+      # DeviceAPI::ADB.screenshot( serial, :filename => '/tmp/filename.png' )
+      def self.screencap( serial, args )
+        
+        filename = args[:filename] or raise "filename not provided (:filename => '/tmp/myfile.png')"
+        
+        convert_carriage_returns = %q{perl -pe 's/\x0D\x0A/\x0A/g'}
+        cmd = "adb -s #{serial} shell screencap -p | #{convert_carriage_returns} > #{filename}"
+        
+        execute(cmd)
       end
 
     end

@@ -77,6 +77,10 @@ module DeviceAPI
       def monkey(args)
         ADB.monkey(serial, args)
       end
+      
+      def screenshot(args)
+        ADB.screencap(serial, args)
+      end
 
       private
 
