@@ -83,7 +83,7 @@ module DeviceAPI
       end
 
       def self.dumpsys(serial, command)
-        result = execute("adb -s #{serial} shell dumpsys iphonesubinfo #{command}")
+        result = execute("adb -s #{serial} shell dumpsys #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
         result.stdout.split("\n").map { |line| line.strip }
       end
