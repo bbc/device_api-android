@@ -59,11 +59,7 @@ module DeviceAPI
       end
 
       def self.getdumpsys(serial)
-        result = execute("adb -s #{serial} shell dumpsys input")
-
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
-
-        lines = result.stdout.split("\n").map { |line| line.strip }
+        lines = dumpsys(serial, 'input')
 
         props = {}
         lines.each do |l|
@@ -73,6 +69,25 @@ module DeviceAPI
         end
         props
       end
+
+      def self.getphoneinfo(serial)
+        lines = dumpsys(serial, 'iphonesubinfo')
+
+        props = {}
+        lines.each do |l|
+          if /(.*) =\s+(.*)/.match(l)
+            props[Regexp.last_match[1]] = Regexp.last_match[2]
+          end
+        end
+        props
+      end
+
+      def self.dumpsys(serial, command)
+        result = execute("adb -s #{serial} shell dumpsys iphonesubinfo #{command}")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        result.stdout.split("\n").map { |line| line.strip }
+      end
+
 
       def self.install_apk(options = {})
         apk = options[:apk]

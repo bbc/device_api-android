@@ -82,6 +82,10 @@ module DeviceAPI
         ADB.screencap(serial, args)
       end
 
+      def imei
+        get_phoneinfo['Device ID']
+      end
+
       private
 
       def get_app_props(key)
@@ -101,6 +105,10 @@ module DeviceAPI
       def get_dumpsys(key)
         @props = ADB.getdumpsys(serial)
         @props[key]
+      end
+
+      def get_phoneinfo
+        ADB.getphoneinfo(serial)
       end
 
       def install_apk(apk)
