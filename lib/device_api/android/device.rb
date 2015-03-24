@@ -23,6 +23,14 @@ module DeviceAPI
         get_prop('ro.product.model')
       end
 
+      def manufacturer
+        get_prop('ro.product.manufacturer')
+      end
+
+      def version
+        get_prop('ro.build.version.release')
+      end
+
       def orientation
         res = get_dumpsys('SurfaceOrientation')
 
