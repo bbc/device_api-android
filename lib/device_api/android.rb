@@ -1,6 +1,7 @@
 # Encoding: utf-8
 require 'device_api/android/adb'
 require 'device_api/android/device'
+require 'device_api/android/signing'
 
 module DeviceAPI
   module Android
