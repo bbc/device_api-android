@@ -19,6 +19,18 @@ module DeviceAPI
         }[@state]
       end
 
+      def range
+        device = self.device
+        model  = self.model
+
+        return device if device == model
+        "#{device}_#{model}"
+      end
+
+      def device
+        get_prop('ro.product.device')
+      end
+
       def model
         get_prop('ro.product.model')
       end
