@@ -21,8 +21,17 @@ module DeviceAPI
         keystore          = options[:keystore]
         keystore_password = options[:keystore_password] || 'hivetesting'
 
+        # Check to see if the APK has already been signed
+        return false if is_apk_signed?(apk)
         result = execute("jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore #{File.expand_path(keystore)} -storepass #{keystore_password} #{apk} #{alias_name}")
         raise SigningCommandError.new(result.stderr) if result.exit != 0
+        true
+      end
+
+      def self.is_apk_signed?(apk_path)
+        #result = execute("aapt list #{apk_path}").lines.collect(&:strip).grep(/^META-INF\//)
+        result = execute("aapt list #{apk_path} | grep '^META-INF.*\.RSA$'")
+        return false if result.empty?
         true
       end
     end
