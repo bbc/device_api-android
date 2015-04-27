@@ -9,7 +9,7 @@ module DeviceAPI
         dname       = options[:dname]     || 'CN=hive'
         password    = options[:password]  || 'android'
 
-        result = execute("keytool -genkey -noprompt -alias #{alias_name} -dname '#{dname}' -keystore #{keystore} -storepass #{password} -keypass #{password} -keyalg MD5withRSA -keysize 2048 -validity 10000")
+        result = execute("keytool -genkey -noprompt -alias #{alias_name} -dname '#{dname}' -keystore #{keystore} -storepass #{password} -keypass #{password} -keyalg RSA -keysize 2048 -validity 10000")
         raise SigningCommandError.new(result.stderr) if result.exit != 0
         true
       end
@@ -26,7 +26,7 @@ module DeviceAPI
           return false unless resign
           unsign_apk(apk)
         end
-        generate_keystore({ keystore: keystore, password: password, alias_name: alias_name }) unless File.exists?(File.expand_path(keystore))
+        generate_keystore({ keystore: keystore, password: keystore_password, alias_name: alias_name }) unless File.exists?(File.expand_path(keystore))
         result = execute("jarsigner -verbose -sigalg MD5withRSA -digestalg SHA1 -keystore #{File.expand_path(keystore)} -storepass #{keystore_password} #{apk} #{alias_name}")
         raise SigningCommandError.new(result.stderr) if result.exit != 0
         true
@@ -34,7 +34,7 @@ module DeviceAPI
 
       def self.is_apk_signed?(apk_path)
         result = execute("aapt list #{apk_path} | grep '^META-INF.*\.RSA$'")
-        return false if result.empty?
+        return false if result.stdout.empty?
         true
       end
 
