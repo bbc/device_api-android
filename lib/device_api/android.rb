@@ -24,6 +24,7 @@ module DeviceAPI
     end
   end
 
+  # Serial error class
   class BadSerialString < StandardError
   end
 end
