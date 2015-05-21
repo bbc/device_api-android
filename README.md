@@ -1,6 +1,6 @@
-# device_api-android
+# DeviceAPI-Android
 
-device_api-android is the android implementation of device_api -- an initiative to allow full automation of device activities.
+*DeviceAPI-Android* is the android implementation of device_api -- an initiative to allow full automation of device activities.
 
 ## Dependencies
 
@@ -93,3 +93,9 @@ The important thing to note here is the Vendor ID and Product ID for the device.
             SUBSYSTEM=="usb", ATTR{idVendor}=="0e79", ATTR{idProduct}=="5009", MODE="0666", OWNER="hive"
 
 Change the Vendor and Product IDs where appropriate, also check that the owner matches the name of the account that will be running the Hive.
+
+## License
+
+*DeviceAPI-Android* is available to everyone under the terms of the MIT open source licence. Take a look at the LICENSE file in the code.
+
+Copyright (c) 2015 BBC
