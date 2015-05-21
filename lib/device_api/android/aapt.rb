@@ -8,12 +8,17 @@ module DeviceAPI
     class AAPT < DeviceAPI::Execution
 
       def self.aapt_available?
-        result = execute('aapt')
-        fail StandardError, 'aapt not found place a copy in $ANDROID_HOME/tools' if result.stdout.include?('No such file or directory')
+        begin
+          result = execute('aapt')
+          return true if result.exit == 2
+        rescue
+          # Some shells cause an error when a binary isn't found
+          return false
+        end
       end
 
       def self.get_app_props(apk)
-        aapt_available?
+        raise 'aapt not found - please create a symlink in $ANDROID_HOME/tools' unless aapt_available?
         result = execute("aapt dump badging #{apk}")
 
         fail result.stderr if result.exit != 0
