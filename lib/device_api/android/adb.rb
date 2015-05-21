@@ -5,14 +5,15 @@ require 'open3'
 require 'ostruct'
 require 'device_api/execution'
 
+# DeviceAPI - an interface to allow for automation of devices
 module DeviceAPI
+  # Android component of DeviceAPI
   module Android
     # Namespace for all methods encapsulating adb calls
     class ADB < Execution
-      # Returns a hash representing connected devices
+      # Returns an array representing connected devices
       # DeviceAPI::ADB.devices #=> { '1232132' => 'device' }
-
-
+      # @return (Array) list of attached devices
       def self.devices
         result = execute_with_timeout_and_retry('adb devices')
 
@@ -31,6 +32,8 @@ module DeviceAPI
       end
 
       # Retrieve device state for a single device
+      # @param serial serial number of device
+      # @return (String) device state
       def self.get_state(serial)
         result = execute('adb get-state -s #{serial}')
 
@@ -41,7 +44,9 @@ module DeviceAPI
         Regexp.last_match[0].strip
       end
 
-
+      # Get the properties of a specified device
+      # @param serial serial number of device
+      # @return (Hash) hash containing device properties
       def self.getprop(serial)
         result = execute("adb -s #{serial} shell getprop")
 
@@ -58,6 +63,9 @@ module DeviceAPI
         props
       end
 
+      # Get the 'input' information from dumpsys
+      # @param serial serial number of device
+      # @return (Hash) hash containing input information from dumpsys
       def self.getdumpsys(serial)
         lines = dumpsys(serial, 'input')
 
@@ -70,6 +78,9 @@ module DeviceAPI
         props
       end
 
+      # Get the 'iphonesubinfo' from dumpsys
+      # @param serial serial number of device
+      # @return (Hash) hash containing iphonesubinfo information from dumpsys
       def self.getphoneinfo(serial)
         lines = dumpsys(serial, 'iphonesubinfo')
 
@@ -82,13 +93,20 @@ module DeviceAPI
         props
       end
 
+      # Returns the 'dumpsys' information from the specified device
+      # @param serial serial number of device
+      # @return (Array) array of results from adb shell dumpsys
       def self.dumpsys(serial, command)
         result = execute("adb -s #{serial} shell dumpsys #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
         result.stdout.split("\n").map { |line| line.strip }
       end
 
-
+      # Installs a specified apk to a specific device
+      # @param [Hash] options the options used for installing an apk
+      # @option options [String] :apk path to apk to install
+      # @option options [String] :serial serial number of device
+      # @return (String) return result from adb install command
       def self.install_apk(options = {})
         apk = options[:apk]
         serial = options[:serial]
@@ -104,6 +122,11 @@ module DeviceAPI
         lines.last
       end
 
+      # Uninstalls a specified package from a specified device
+      # @param [Hash] options the options used for uninstalling a package
+      # @option options [String] :package_name package to uninstall
+      # @option options [String] :serial serial number of device
+      # @return (String) return result from adb uninstall command
       def self.uninstall_apk(options = {})
         package_name = options[:package_name]
         serial = options[:serial]
@@ -115,6 +138,9 @@ module DeviceAPI
         lines.last
       end
 
+      # Returns the uptime of the specified device
+      # @param serial serial number of device
+      # @return (Float) uptime in seconds
       def self.get_uptime(serial)
         result = execute("adb -s #{serial} shell cat /proc/uptime")
 
@@ -130,14 +156,23 @@ module DeviceAPI
         uptime
       end
 
+      # Reboots the specified device
+      # @param serial serial number of device
+      # @return (nil) Nil if successful, otherwise an error is raised
       def self.reboot(serial)
         result = execute("adb -s #{serial} reboot")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
-      # Run monkey
-      # At a minimum you have to provide the package name of an installed app:
-      # DeviceAPI::ADB.monkey( serial, :package => 'my.lovely.app' )
+      # Runs monkey testing
+      # @param serial serial number of device
+      # @param [Hash] args hash of arguments used for starting testing
+      # @option args [String] :events (10000) number of events to run
+      # @option args [String] :package name of package to run the tests against
+      # @option args [String] :seed pass the seed number (optional)
+      # @option args [String] :throttle throttle value (optional)
+      # @example
+      #   DeviceAPI::ADB.monkey( serial, :package => 'my.lovely.app' )
       def self.monkey(serial, args)
 
         events = args[:events] || 10000
@@ -153,7 +188,11 @@ module DeviceAPI
       end
       
       # Take a screenshot from the device
-      # DeviceAPI::ADB.screenshot( serial, :filename => '/tmp/filename.png' )
+      # @param serial serial number of device
+      # @param [Hash] args hash of arguments
+      # @option args [String] :filename name (with full path) required to save the image
+      # @example
+      #   DeviceAPI::ADB.screenshot( serial, :filename => '/tmp/filename.png' )
       def self.screencap( serial, args )
         
         filename = args[:filename] or raise "filename not provided (:filename => '/tmp/myfile.png')"
@@ -166,7 +205,7 @@ module DeviceAPI
 
     end
 
-
+    # ADB Error class
     class ADBCommandError < StandardError
       def initialize(msg)
         super(msg)

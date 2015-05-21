@@ -20,7 +20,7 @@ You'll need to require the library in your code:
 
 Try connecting an android device with usb, and run:
 
-    device = DeviceAPI::Android.devices
+    devices = DeviceAPI::Android.devices
 
 You might need to set your device to developer mode, and turn on usb debugging so that the android debug bridge can detect your device.
 
