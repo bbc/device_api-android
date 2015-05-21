@@ -51,6 +51,18 @@ device.orientation # :landscape / :portrait
     device.install('location/apk_to_install.apk') # will install the apk on the device
     device.uninstall('my.package.name') # will uninstall the package matching the package name
 
+#### APK Signing
+
+An APK can be signed using *DeviceAPI*. To do so you can simply run:
+
+    DeviceAPI::Android::Signing.sign_apk({apk: apk_path, resign: true})
+
+If you don't already have a keystore setup then one will be created for you with some defaults already set. If you wish to setup a keystore using your own options you can do so using something like the following:
+
+    DeviceAPI::Android::Signing.generate_keystore( { keystore: '~/new_kestore.keystore', password: 'new_password' } )
+
+This allows you to setup a keystore with the options required by any testing framework
+
 ### Package details
 
     device.package_name('app.apk') # returns some.package.name
