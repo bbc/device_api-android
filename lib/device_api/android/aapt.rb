@@ -13,20 +13,15 @@ module DeviceAPI
       # Check to ensure that aapt has been setup correctly and is available
       # @return (Boolean) true if aapt is available, false otherwise
       def self.aapt_available?
-        begin
-          result = execute('aapt')
-          return true if result.exit == 2
-        rescue
-          # Some shells cause an error when a binary isn't found
-          return false
-        end
+        result = execute('which aapt')
+        result.exit == 0
       end
 
       # Gets properties from the apk and returns them in a hash
       # @param apk path to the apk
       # @return (Hash) list of properties from the apk
       def self.get_app_props(apk)
-        raise 'aapt not found - please create a symlink in $ANDROID_HOME/tools' unless aapt_available?
+        raise StandardError.new('aapt not found - please create a symlink in $ANDROID_HOME/tools') unless aapt_available?
         result = execute("aapt dump badging #{apk}")
 
         fail result.stderr if result.exit != 0
