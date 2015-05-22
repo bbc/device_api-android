@@ -49,7 +49,7 @@ For example:
 
 #### Device orientation
 
-device.orientation # :landscape / :portrait
+    device.orientation # :landscape / :portrait
 
 #### Install/uninstall apk
 
