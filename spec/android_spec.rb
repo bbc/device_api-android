@@ -196,12 +196,10 @@ _______________________________________________________
         end
 
         it 'can raise an error if aapt can not be found' do
-          out = 'No such file or directory'
-
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { ['', '', $STATUS_ONE] }
           expect { device.app_version_number('iplayer.apk') }.
-              to raise_error(StandardError, 'aapt not found place a copy in $ANDROID_HOME/tools')
+              to raise_error(StandardError, 'aapt not found - please create a symlink in $ANDROID_HOME/tools')
         end
 
       end
