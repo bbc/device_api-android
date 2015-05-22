@@ -5,6 +5,7 @@
 ## Dependencies
 
 device_api-android shells out to a number of android command line tools. You will need to make sure the android sdk is installed and you have the following commands on your path:
+
 * adb
 * aapt
 
@@ -27,8 +28,11 @@ You might need to set your device to developer mode, and turn on usb debugging s
 ### Detecting devices
 
 There are two methods for detecting devices:
+
     DeviceAPI::Android.devices 
+
 This returns an array of objects representing the connected devices. You get an empty array if there are no connected devices.
+
     DeviceAPI::Android.device(serial_id)
     
 This looks for a device with a matching serial_id and returns a single device object.
@@ -38,6 +42,7 @@ This looks for a device with a matching serial_id and returns a single device ob
 When device-api detects a device, it returns a device object that lets you interact with and query the device with various android tools.
 
 For example:
+
     device = DeviceAPI::Android.device(serial_id)
     device.serial # "01498A0004005015"
     device.model # "Galaxy Nexus"
