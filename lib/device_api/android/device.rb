@@ -64,7 +64,7 @@ module DeviceAPI
         res = get_dumpsys('SurfaceOrientation')
 
         case res
-          when '0'
+          when '0','2'
             :portrait
           when '1', '3'
             :landscape
