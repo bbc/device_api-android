@@ -93,6 +93,21 @@ module DeviceAPI
         props
       end
 
+      def self.get_battery_info(serial)
+        lines = dumpsys(serial, 'battery')
+
+        require 'pry'
+        binding.pry
+        props = {}
+        lines.each do |l|
+          if /(.*) :\s+(.*)/.match(l)
+            props[Regexp.last_match[1]] = Regexp.last_match[2]
+          end
+        end
+
+        props
+      end
+
       # Returns the 'dumpsys' information from the specified device
       # @param serial serial number of device
       # @return (Array) array of results from adb shell dumpsys

@@ -58,6 +58,16 @@ module DeviceAPI
         get_prop('ro.build.version.release')
       end
 
+      # Return the battery level
+      # @return (String) device battery level
+      def battery_level
+
+        res = get_battery_info
+
+        require 'pry'
+        binding.pry
+      end
+
       # Return the device orientation
       # @return (String) current device orientation
       def orientation
@@ -160,6 +170,10 @@ module DeviceAPI
       def get_dumpsys(key)
         @props = ADB.getdumpsys(serial)
         @props[key]
+      end
+
+      def get_battery_info
+        ADB.get_battery_info(serial)
       end
 
       def get_phoneinfo
