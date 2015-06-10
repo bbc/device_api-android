@@ -54,13 +54,7 @@ module DeviceAPI
 
         lines = result.stdout.split("\n")
 
-        props = {}
-        lines.each do |l|
-          if /\[(.*)\]:\s+\[(.*)\]/.match(l)
-            props[Regexp.last_match[1]] = Regexp.last_match[2]
-          end
-        end
-        props
+        process_dumpsys('[(.*)\]:\s+\[(.*)\]', lines)
       end
 
       # Get the 'input' information from dumpsys
@@ -68,14 +62,7 @@ module DeviceAPI
       # @return (Hash) hash containing input information from dumpsys
       def self.getdumpsys(serial)
         lines = dumpsys(serial, 'input')
-
-        props = {}
-        lines.each do |l|
-          if /(.*):\s+(.*)/.match(l)
-            props[Regexp.last_match[1]] = Regexp.last_match[2]
-          end
-        end
-        props
+        process_dumpsys('(.*):\s+(.*)', lines)
       end
 
       # Get the 'iphonesubinfo' from dumpsys
@@ -83,24 +70,19 @@ module DeviceAPI
       # @return (Hash) hash containing iphonesubinfo information from dumpsys
       def self.getphoneinfo(serial)
         lines = dumpsys(serial, 'iphonesubinfo')
-
-        props = {}
-        lines.each do |l|
-          if /(.*) =\s+(.*)/.match(l)
-            props[Regexp.last_match[1]] = Regexp.last_match[2]
-          end
-        end
-        props
+        process_dumpsys('(.*) =\s+(.*)', lines)
       end
 
       def self.get_battery_info(serial)
         lines = dumpsys(serial, 'battery')
+        process_dumpsys('(.*):\s+(.*)', lines)
+      end
 
-        require 'pry'
-        binding.pry
+      def self.process_dumpsys(regex_string, data)
         props = {}
-        lines.each do |l|
-          if /(.*) :\s+(.*)/.match(l)
+        regex = Regexp.new(regex_string)
+        data.each do |line|
+          if regex.match(line)
             props[Regexp.last_match[1]] = Regexp.last_match[2]
           end
         end
@@ -226,7 +208,5 @@ module DeviceAPI
         super(msg)
       end
     end
-
-
   end
 end

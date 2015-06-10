@@ -61,11 +61,13 @@ module DeviceAPI
       # Return the battery level
       # @return (String) device battery level
       def battery_level
+        get_battery_info['level']
+      end
 
-        res = get_battery_info
-
-        require 'pry'
-        binding.pry
+      # Is the device currently being powered?
+      # @return (Boolean) true if it is being powered in some way, false if it is unpowered
+      def powered?
+        !get_battery_info.select { |keys| keys.include?('powered')}.select { |_,v| v == 'true' }.empty?
       end
 
       # Return the device orientation
