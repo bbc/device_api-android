@@ -145,7 +145,6 @@ module DeviceAPI
 
       # Capture screenshot on device
       # @param [Hash] args arguments to pass on to ADB.screencap
-
       def screenshot(args)
         ADB.screencap(serial, args)
       end

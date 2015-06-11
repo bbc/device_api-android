@@ -93,9 +93,6 @@ module DeviceAPI
         props
       end
 
-      # Returns the 'dumpsys' information from the specified device
-      # @param serial serial number of device
-      # @return (Array) array of results from adb shell dumpsys
       def self.getpowerinfo(serial)
         lines = dumpsys(serial, 'power')
 
@@ -108,6 +105,9 @@ module DeviceAPI
         props
       end
 
+      # Returns the 'dumpsys' information from the specified device
+      # @param serial serial number of device
+      # @return (Array) array of results from adb shell dumpsys
       def self.dumpsys(serial, command)
         result = execute("adb -s #{serial} shell dumpsys #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
