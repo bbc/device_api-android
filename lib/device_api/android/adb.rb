@@ -96,6 +96,18 @@ module DeviceAPI
       # Returns the 'dumpsys' information from the specified device
       # @param serial serial number of device
       # @return (Array) array of results from adb shell dumpsys
+      def self.getpowerinfo(serial)
+        lines = dumpsys(serial, 'power')
+
+        props = {}
+        lines.each do |l|
+          if /(.*)=(.*)/.match(l)
+            props[Regexp.last_match[1]] = Regexp.last_match[2]
+          end
+        end
+        props
+      end
+
       def self.dumpsys(serial, command)
         result = execute("adb -s #{serial} shell dumpsys #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
@@ -203,6 +215,13 @@ module DeviceAPI
         execute(cmd)
       end
 
+      def self.keyevent(serial, keyevent)
+        execute("adb -s #{serial} shell input keyevent #{keyevent}")
+      end
+
+      def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
+        execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
+      end
     end
 
     # ADB Error class

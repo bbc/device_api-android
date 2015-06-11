@@ -22,3 +22,6 @@ PLATFORMS
 DEPENDENCIES
   device_api (>= 1.0.0)
   rspec
+
+BUNDLED WITH
+   1.10.2
