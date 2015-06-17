@@ -173,6 +173,10 @@ module DeviceAPI
       def uninstall_apk(package_name)
         ADB.uninstall_apk(package_name: package_name, serial: serial)
       end
+
+      def get_wifi_status
+        ADB.wifi(serial)
+      end
     end
   end
 end
