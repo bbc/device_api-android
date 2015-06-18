@@ -9,6 +9,20 @@ module DeviceAPI
   module Android
     # Device class used for containing the accessors of the physical device information
     class Device < DeviceAPI::Device
+
+      cattr_accessor :subclasses; self.subclasses = {}
+
+      def self.inherited(klass)
+        key = /::([^:]+)$/.match(klass.to_s.downcase)[1].to_sym
+
+        self.subclasses[key] = klass
+      end
+
+      def self.create(type, options = {} )
+        return self.subclasses[type.to_sym].new(options) if self.subclasses[type.to_sym]
+        return self.new(options)
+      end
+
       def initialize(options = {})
         @serial = options[:serial]
         @state = options[:state]
@@ -153,6 +167,15 @@ module DeviceAPI
         get_phoneinfo['Device ID']
       end
 
+      def screen_on?
+        return true if get_powerinfo['mScreenOn'].to_s.downcase == 'true'
+        false
+      end
+
+      def unlock
+        ADB.keyevent(serial, '26') unless screen_on?
+      end
+
       private
 
       def get_app_props(key)
@@ -172,6 +195,10 @@ module DeviceAPI
       def get_dumpsys(key)
         @props = ADB.getdumpsys(serial)
         @props[key]
+      end
+
+      def get_powerinfo
+        ADB.getpowerinfo(serial)
       end
 
       def get_battery_info

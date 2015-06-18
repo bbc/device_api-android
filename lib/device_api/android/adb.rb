@@ -90,6 +90,11 @@ module DeviceAPI
         props
       end
 
+      def self.getpowerinfo(serial)
+        lines = dumpsys(serial, 'power')
+        process_dumpsys('(.*)=(.*)', lines)
+      end
+
       # Returns the 'dumpsys' information from the specified device
       # @param serial serial number of device
       # @return (Array) array of results from adb shell dumpsys
@@ -200,14 +205,12 @@ module DeviceAPI
         execute(cmd)
       end
 
-      # Returns the wifi status of device
-      # @param serial serial number of device
-      # @example
-      #   DeviceAPI::ADB.wifi(serial)
-      def self.wifi(serial)
-          result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
-          raise ADBCommandError.new(result.stderr) if result.exit != 0
-          return result.match("state:(.*?),") result.match("extra:(.*?),")) if result.exit != 0         
+      def self.keyevent(serial, keyevent)
+        execute("adb -s #{serial} shell input keyevent #{keyevent}")
+      end
+
+      def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
+        execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
       end
     end
 
@@ -217,5 +220,7 @@ module DeviceAPI
         super(msg)
       end
     end
+
+
   end
 end
