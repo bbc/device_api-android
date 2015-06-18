@@ -205,6 +205,16 @@ module DeviceAPI
         execute(cmd)
       end
 
+      # Returns the wifi status of device
+      # @param serial serial number of device
+      # @example
+      #   DeviceAPI::ADB.wifi(serial)
+      def self.wifi(serial)
+        result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        return result.match("state:(.*?),") result.match("extra:(.*?),")) if result.exit == 0
+      end
+
       def self.keyevent(serial, keyevent)
         execute("adb -s #{serial} shell input keyevent #{keyevent}")
       end
