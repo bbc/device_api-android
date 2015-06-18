@@ -54,13 +54,7 @@ module DeviceAPI
 
         lines = result.stdout.split("\n")
 
-        props = {}
-        lines.each do |l|
-          if /\[(.*)\]:\s+\[(.*)\]/.match(l)
-            props[Regexp.last_match[1]] = Regexp.last_match[2]
-          end
-        end
-        props
+        process_dumpsys('[(.*)\]:\s+\[(.*)\]', lines)
       end
 
       # Get the 'input' information from dumpsys
@@ -68,14 +62,7 @@ module DeviceAPI
       # @return (Hash) hash containing input information from dumpsys
       def self.getdumpsys(serial)
         lines = dumpsys(serial, 'input')
-
-        props = {}
-        lines.each do |l|
-          if /(.*):\s+(.*)/.match(l)
-            props[Regexp.last_match[1]] = Regexp.last_match[2]
-          end
-        end
-        props
+        process_dumpsys('(.*):\s+(.*)', lines)
       end
 
       # Get the 'iphonesubinfo' from dumpsys
@@ -83,14 +70,29 @@ module DeviceAPI
       # @return (Hash) hash containing iphonesubinfo information from dumpsys
       def self.getphoneinfo(serial)
         lines = dumpsys(serial, 'iphonesubinfo')
+        process_dumpsys('(.*) =\s+(.*)', lines)
+      end
 
+      def self.get_battery_info(serial)
+        lines = dumpsys(serial, 'battery')
+        process_dumpsys('(.*):\s+(.*)', lines)
+      end
+
+      def self.process_dumpsys(regex_string, data)
         props = {}
-        lines.each do |l|
-          if /(.*) =\s+(.*)/.match(l)
+        regex = Regexp.new(regex_string)
+        data.each do |line|
+          if regex.match(line)
             props[Regexp.last_match[1]] = Regexp.last_match[2]
           end
         end
+
         props
+      end
+
+      def self.getpowerinfo(serial)
+        lines = dumpsys(serial, 'power')
+        process_dumpsys('(.*)=(.*)', lines)
       end
 
       # Returns the 'dumpsys' information from the specified device
@@ -203,6 +205,23 @@ module DeviceAPI
         execute(cmd)
       end
 
+      # Returns the wifi status of device
+      # @param serial serial number of device
+      # @example
+      #   DeviceAPI::ADB.wifi(serial)
+      def self.wifi(serial)
+        result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        return result.match("state:(.*?),") result.match("extra:(.*?),")) if result.exit == 0
+      end
+
+      def self.keyevent(serial, keyevent)
+        execute("adb -s #{serial} shell input keyevent #{keyevent}")
+      end
+
+      def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
+        execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
+      end
     end
 
     # ADB Error class

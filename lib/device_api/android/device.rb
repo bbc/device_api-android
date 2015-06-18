@@ -18,6 +18,11 @@ module DeviceAPI
         self.subclasses[key] = klass
       end
 
+      def self.create(type, options = {} )
+        return self.subclasses[type.to_sym].new(options) if self.subclasses[type.to_sym]
+        return self.new(options)
+      end
+
       def initialize(options = {})
         @serial = options[:serial]
         @state = options[:state]
@@ -67,6 +72,18 @@ module DeviceAPI
         get_prop('ro.build.version.release')
       end
 
+      # Return the battery level
+      # @return (String) device battery level
+      def battery_level
+        get_battery_info['level']
+      end
+
+      # Is the device currently being powered?
+      # @return (Boolean) true if it is being powered in some way, false if it is unpowered
+      def powered?
+        !get_battery_info.select { |keys| keys.include?('powered')}.select { |_,v| v == 'true' }.empty?
+      end
+
       # Return the device orientation
       # @return (String) current device orientation
       def orientation
@@ -108,7 +125,7 @@ module DeviceAPI
           when 'Success'
             :success
           else
-            fail StandardError, "Unable to uninstall '#{package_name}' Error Reported: #{res}", caller
+            fail StandardError, "Unable to install 'package_name' Error Reported: #{res}", caller
         end
       end
 
@@ -154,6 +171,15 @@ module DeviceAPI
         get_memory_info
       end
 
+      def screen_on?
+        return true if get_powerinfo['mScreenOn'].to_s.downcase == 'true'
+        false
+      end
+
+      def unlock
+        ADB.keyevent(serial, '26') unless screen_on?
+      end
+
       private
 
       def get_memory_info
@@ -179,6 +205,14 @@ module DeviceAPI
         @props[key]
       end
 
+      def get_powerinfo
+        ADB.getpowerinfo(serial)
+      end
+
+      def get_battery_info
+        ADB.get_battery_info(serial)
+      end
+
       def get_phoneinfo
         ADB.getphoneinfo(serial)
       end
@@ -189,6 +223,10 @@ module DeviceAPI
 
       def uninstall_apk(package_name)
         ADB.uninstall_apk(package_name: package_name, serial: serial)
+      end
+
+      def get_wifi_status
+        ADB.wifi(serial)
       end
     end
   end
