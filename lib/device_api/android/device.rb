@@ -72,6 +72,18 @@ module DeviceAPI
         get_prop('ro.build.version.release')
       end
 
+      # Return the battery level
+      # @return (String) device battery level
+      def battery_level
+        get_battery_info['level']
+      end
+
+      # Is the device currently being powered?
+      # @return (Boolean) true if it is being powered in some way, false if it is unpowered
+      def powered?
+        !get_battery_info.select { |keys| keys.include?('powered')}.select { |_,v| v == 'true' }.empty?
+      end
+
       # Return the device orientation
       # @return (String) current device orientation
       def orientation
@@ -189,6 +201,10 @@ module DeviceAPI
         ADB.getpowerinfo(serial)
       end
 
+      def get_battery_info
+        ADB.get_battery_info(serial)
+      end
+
       def get_phoneinfo
         ADB.getphoneinfo(serial)
       end
@@ -199,6 +215,10 @@ module DeviceAPI
 
       def uninstall_apk(package_name)
         ADB.uninstall_apk(package_name: package_name, serial: serial)
+      end
+
+      def get_wifi_status
+        ADB.wifi(serial)
       end
     end
   end
