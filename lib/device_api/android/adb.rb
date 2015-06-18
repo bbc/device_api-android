@@ -54,7 +54,7 @@ module DeviceAPI
 
         lines = result.stdout.split("\n")
 
-        process_dumpsys('[(.*)\]:\s+\[(.*)\]', lines)
+        process_dumpsys('\[(.*)\]:\s+\[(.*)\]', lines)
       end
 
       # Get the 'input' information from dumpsys
@@ -212,7 +212,7 @@ module DeviceAPI
       def self.wifi(serial)
         result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
-        return result.match("state:(.*?),") result.match("extra:(.*?),")) if result.exit == 0
+        return result.match("state:(.*?),") #result.match("extra:(.*?),")) if result.exit == 0
       end
 
       def self.keyevent(serial, keyevent)
