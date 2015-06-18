@@ -11,8 +11,6 @@ module DeviceAPI
     class Device < DeviceAPI::Device
 
       def self.inherited(klass)
-        require 'pry'
-        binding.pry
         key = /::([^:]+)$/.match(klass.to_s.downcase)[1].to_sym
 
         self.subclasses[key] = klass
@@ -152,8 +150,6 @@ module DeviceAPI
 
       def memory
         get_memory_info
-        require 'pry'
-        binding.pry
       end
 
       private
