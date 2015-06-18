@@ -9,6 +9,15 @@ module DeviceAPI
   module Android
     # Device class used for containing the accessors of the physical device information
     class Device < DeviceAPI::Device
+
+      def self.inherited(klass)
+        require 'pry'
+        binding.pry
+        key = /::([^:]+)$/.match(klass.to_s.downcase)[1].to_sym
+
+        self.subclasses[key] = klass
+      end
+
       def initialize(options = {})
         @serial = options[:serial]
         @state = options[:state]
@@ -99,7 +108,7 @@ module DeviceAPI
           when 'Success'
             :success
           else
-            fail StandardError, "Unable to install 'package_name' Error Reported: #{res}", caller
+            fail StandardError, "Unable to uninstall '#{package_name}' Error Reported: #{res}", caller
         end
       end
 
@@ -141,7 +150,17 @@ module DeviceAPI
         get_phoneinfo['Device ID']
       end
 
+      def memory
+        get_memory_info
+        require 'pry'
+        binding.pry
+      end
+
       private
+
+      def get_memory_info
+        @memory = DeviceAPI::Android::Plugin::Memory.new(serial: serial) unless @memory
+      end
 
       def get_app_props(key)
         unless @app_props
