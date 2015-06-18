@@ -54,7 +54,7 @@ module DeviceAPI
 
         lines = result.stdout.split("\n")
 
-        process_dumpsys('[(.*)\]:\s+\[(.*)\]', lines)
+        process_dumpsys('\[(.*)\]:\s+\[(.*)\]', lines)
       end
 
       # Get the 'input' information from dumpsys
