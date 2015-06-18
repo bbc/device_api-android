@@ -212,6 +212,13 @@ module DeviceAPI
         execute(cmd)
       end
 
+      def self.keyevent(serial, keyevent)
+        execute("adb -s #{serial} shell input keyevent #{keyevent}")
+      end
+
+      def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
+        execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
+      end
     end
 
     # ADB Error class
