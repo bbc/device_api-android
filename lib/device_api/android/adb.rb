@@ -92,14 +92,7 @@ module DeviceAPI
 
       def self.getpowerinfo(serial)
         lines = dumpsys(serial, 'power')
-
-        props = {}
-        lines.each do |l|
-          if /(.*)=(.*)/.match(l)
-            props[Regexp.last_match[1]] = Regexp.last_match[2]
-          end
-        end
-        props
+        process_dumpsys('(.*)=(.*)', lines)
       end
 
       # Returns the 'dumpsys' information from the specified device
