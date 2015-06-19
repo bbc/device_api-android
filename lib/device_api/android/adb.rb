@@ -205,14 +205,14 @@ module DeviceAPI
         execute(cmd)
       end
 
-      # Returns the wifi status of device
+      # Returns wifi status and name of wifi
       # @param serial serial number of device
       # @example
       #   DeviceAPI::ADB.wifi(serial)
       def self.wifi(serial)
         result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
-        return result.match("state:(.*?),") result.match("extra:(.*?),")) if result.exit == 0
+        return {:status => result.stdout.match("state:(.*?),")[1].strip, :wifi => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
       end
 
       def self.keyevent(serial, keyevent)
