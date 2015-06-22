@@ -12,11 +12,13 @@ module DeviceAPI
 
       @@subclasses; @@subclasses = {}
 
+      # Called by any inheritors to register themselves with the parent class
       def self.inherited(klass)
         key = /::([^:]+)$/.match(klass.to_s.downcase)[1].to_sym
         @@subclasses[key] = klass
       end
 
+      # Returns an object of the specified type, if it exists. Defaults to returning self
       def self.create(type, options = {} )
         return @@subclasses[type.to_sym].new(options) if @@subclasses[type.to_sym]
         return self.new(options)
@@ -166,15 +168,20 @@ module DeviceAPI
         get_phoneinfo['Device ID']
       end
 
+      # Get the memory information for the current device
+      # @return [DeviceAPI::Android::Plugins::Memory] the memory plugin containing relevant information
       def memory
         get_memory_info
       end
 
+      # Check if the devices screen is currently turned on
+      # @return [Boolean] true if the screen is on, otherwise false
       def screen_on?
         return true if get_powerinfo['mScreenOn'].to_s.downcase == 'true'
         false
       end
 
+      # Unlock the device by sending a wakeup command
       def unlock
         ADB.keyevent(serial, '26') unless screen_on?
       end

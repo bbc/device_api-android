@@ -26,6 +26,7 @@ module DeviceAPI
       DeviceAPI::Android::Device.create( self.get_device_type(serial),  { serial: serial, state: state })
     end
 
+    # Return the device type used in determining which Device Object to create
     def self.get_device_type(serial)
       return :default if Device.new(serial: serial).manufacturer.nil?
       case Device.new(serial: serial).manufacturer.downcase

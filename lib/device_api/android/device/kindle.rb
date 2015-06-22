@@ -1,5 +1,6 @@
 module DeviceAPI
   module Android
+    # Kindle specific device class
     class Kindle < Device
       # On non-Kindle devices, if a device is locked without a password (i.e. 'Swipe to unlock'), then
       # you can unlock that device by broadcasting a 'WakeUp' intent. On Kindle devices, this does not

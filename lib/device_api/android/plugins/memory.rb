@@ -1,8 +1,12 @@
 module DeviceAPI
   module Android
+    # Plugins contain extra information about the attached device(s)
     module Plugin
+      # Class used to provide information about process memory usage
+      # and device memory usage
       class Memory
 
+        # Class used for holding process information
         class MemInfo
           attr_accessor :process, :memory, :pid
           def initialize(options = {})
@@ -12,6 +16,7 @@ module DeviceAPI
           end
         end
 
+        # Class used for storing process information
         class RAM
           attr_accessor :total, :free, :used, :lost, :tuning
           def initialize(options = {})
@@ -32,11 +37,12 @@ module DeviceAPI
           groups = @info.split('')
 
           raise 'A different ADB result has been received' unless groups[1].first == 'Total PSS by process:'
-          @pss_by_process = []
+          @processes = []
           process_total_pss_by_process(groups[1])
           process_ram_info(groups[4])
         end
 
+        # Processes memory used by each running process
         def process_total_pss_by_process(data)
           data.each do |l|
             if /(.*):\s+(.*)\s+\(.*pid\s+(\S*).*\)/.match(l)
@@ -45,6 +51,7 @@ module DeviceAPI
           end
         end
 
+        # Processes memory used by the device
         def process_ram_info(data)
           ram_info = {}
           data.each do |l|
