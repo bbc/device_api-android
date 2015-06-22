@@ -10,8 +10,6 @@ module DeviceAPI
     # Device class used for containing the accessors of the physical device information
     class Device < DeviceAPI::Device
 
-      #cattr_accessor :subclasses; self.subclasses = {}
-      #class_attribute :subclasses; self.subclasses = {}
       @@subclasses; @@subclasses = {}
 
       def self.inherited(klass)
