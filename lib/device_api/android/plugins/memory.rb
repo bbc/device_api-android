@@ -23,7 +23,8 @@ module DeviceAPI
           end
         end
 
-        attr_accessor :info, :apps, :pss_by_process, :memory
+        attr_accessor :info, :apps, :processes, :mem_info
+
         def initialize(options = {})
           @serial = options[:serial]
           @info = options[:data] || ADB.dumpsys(@serial, 'meminfo')
@@ -39,7 +40,7 @@ module DeviceAPI
         def process_total_pss_by_process(data)
           data.each do |l|
             if /(.*):\s+(.*)\s+\(.*pid\s+(\S*).*\)/.match(l)
-              @pss_by_process << MemInfo.new(process: Regexp.last_match[2], memory: Regexp.last_match[1], pid: Regexp.last_match[3] )
+              @processes << MemInfo.new(process: Regexp.last_match[2], memory: Regexp.last_match[1], pid: Regexp.last_match[3] )
             end
           end
         end
@@ -53,7 +54,7 @@ module DeviceAPI
               ram_info[Regexp.last_match[1].downcase] = Regexp.last_match[2]
             end
           end
-          @memory = RAM.new(total: ram_info['total ram'], free: ram_info['free ram'], used: ram_info['used ram'], lost: ram_info['lost'], tuning: ram_info['tuning'])
+          @mem_info = RAM.new(total: ram_info['total ram'], free: ram_info['free ram'], used: ram_info['used ram'], lost: ram_info['lost'], tuning: ram_info['tuning'])
         end
       end
     end
