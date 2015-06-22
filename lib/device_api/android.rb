@@ -26,6 +26,7 @@ module DeviceAPI
     end
 
     def self.get_device_type(serial)
+      return :default if Device.new(serial: serial).manufacturer.nil?
       case Device.new(serial: serial).manufacturer.downcase
         when 'amazon'
           type = :kindle
