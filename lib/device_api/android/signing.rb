@@ -54,7 +54,7 @@ module DeviceAPI
       # @param [String] apk_path full path to apk to check
       # @return returns false if the apk is unsigned, true if it is signed
       def self.is_apk_signed?(apk_path)
-        result = execute("aapt list #{apk_path} | grep '^META-INF.*\.RSA$'")
+        result = execute("aapt list #{apk_path} | grep '^META-INF.*\..*'")
         return false if result.stdout.empty?
         true
       end
@@ -63,7 +63,7 @@ module DeviceAPI
       # @param [String] apk_path full path to the apk
       # @return [Boolean, Exception] returns true if the apk is successfully unsigned, otherwise an exception is raised
       def self.unsign_apk(apk_path)
-        file_list = execute("aapt list #{apk_path} | grep '^META-INF.*\.RSA$'")
+        file_list = execute("aapt list #{apk_path} | grep '^META-INF.*\..*'")
         result = execute("aapt remove #{apk_path} #{file_list.stdout.split(/\s+/).join(' ')}")
         raise SigningCommandError.new(result.stderr) if result.exit != 0
         true
