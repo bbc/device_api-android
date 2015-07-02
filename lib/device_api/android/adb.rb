@@ -205,14 +205,14 @@ module DeviceAPI
         execute(cmd)
       end
 
-      # Returns the wifi status and wifi name
+      # Returns wifi status and access point name
       # @param serial serial number of device
       # @example
       #   DeviceAPI::ADB.wifi(serial)
       def self.wifi(serial)
         result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
-        return {:status => result.stdout.match("state:(.*?),")[1].strip, :wifi => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
+        return {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
       end
 
       def self.keyevent(serial, keyevent)
@@ -221,6 +221,17 @@ module DeviceAPI
 
       def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
         execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
+      end
+
+      # Starts intent using adb 
+      # Returns stdout
+      # @param serial serial number of device 
+      # @param command -option activity 
+      # @example
+      # DeviceAPI::ADB.am(serial, "-a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
+      def self.am(serial, command)
+        result = execute("adb -s #{serial} shell am start #{command}")
+        return result.stdout
       end
     end
 
