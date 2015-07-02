@@ -4,7 +4,7 @@
 require 'open3'
 require 'ostruct'
 require 'device_api/execution'
-require 'pry'
+
 # DeviceAPI - an interface to allow for automation of devices
 module DeviceAPI
   # Android component of DeviceAPI
