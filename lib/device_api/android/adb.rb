@@ -217,10 +217,12 @@ module DeviceAPI
 
       def self.keyevent(serial, keyevent)
         execute("adb -s #{serial} shell input keyevent #{keyevent}")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
       def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
         execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
       # Starts intent using adb 
@@ -231,6 +233,7 @@ module DeviceAPI
       # DeviceAPI::ADB.am(serial, "-a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
       def self.am(serial, command)
         result = execute("adb -s #{serial} shell am start #{command}")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
         return result.stdout
       end
     end
