@@ -175,6 +175,18 @@ module DeviceAPI
         ADB.keyevent(serial, '26') unless screen_on?
       end
 
+      def dpi
+        get_dpi(serial)
+      end
+
+      def type
+        if get_dpi.to_i > 533
+          :tablet
+        else
+          :mobile
+        end
+      end
+
       private
 
       def get_app_props(key)
@@ -218,6 +230,10 @@ module DeviceAPI
 
       def get_wifi_status
         ADB.wifi(serial)
+      end
+
+      def get_dpi
+        ADB.get_device_dpi(serial)
       end
     end
   end
