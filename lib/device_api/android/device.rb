@@ -175,10 +175,14 @@ module DeviceAPI
         ADB.keyevent(serial, '26') unless screen_on?
       end
 
+      # Return the DPI of the attached device
+      # @return [String] DPI of attached device
       def dpi
         get_dpi(serial)
       end
 
+      # Return the device type based on the DPI
+      # @return [Symbol] :tablet or :mobile based upon the devices DPI
       def type
         if get_dpi.to_i > 533
           :tablet
