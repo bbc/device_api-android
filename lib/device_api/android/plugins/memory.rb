@@ -31,8 +31,8 @@ module DeviceAPI
         attr_accessor :processes, :mem_info
 
         def initialize(options = {})
-          @serial = options[:serial]
-          info = options[:data] || ADB.dumpsys(@serial, 'meminfo')
+          serial = options[:serial]
+          info = options[:data] || ADB.dumpsys(serial, 'meminfo')
 
           groups = info.split('')
 
