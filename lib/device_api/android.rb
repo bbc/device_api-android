@@ -1,9 +1,13 @@
 # Encoding: utf-8
 require 'device_api/android/adb'
-require 'device_api/android/signing'
 require 'device_api/android/device'
+require 'device_api/android/signing'
 
-Dir[File.dirname(__FILE__) + '/android/device/*.rb'].each {|file| require file }
+# Load plugins
+require 'device_api/android/plugins/memory'
+
+# Load additional device types
+require 'device_api/android/device/kindle'
 
 module DeviceAPI
   module Android
@@ -25,6 +29,7 @@ module DeviceAPI
       DeviceAPI::Android::Device.create( self.get_device_type(serial),  { serial: serial, state: state })
     end
 
+    # Return the device type used in determining which Device Object to create
     def self.get_device_type(serial)
       return :default if Device.new(serial: serial).manufacturer.nil?
       case Device.new(serial: serial).manufacturer.downcase

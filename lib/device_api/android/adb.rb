@@ -73,11 +73,18 @@ module DeviceAPI
         process_dumpsys('(.*) =\s+(.*)', lines)
       end
 
+      # Get the 'battery' information from dumpsys
+      # @param [String] serial serial number of device
+      # @return [Hash] hash containing battery information from dumpsys
       def self.get_battery_info(serial)
         lines = dumpsys(serial, 'battery')
         process_dumpsys('(.*):\s+(.*)', lines)
       end
 
+      # Processes the results from dumpsys to format them into a hash
+      # @param [String] regex_string regex string used to separate the results from the keys
+      # @param [Array] data data returned from dumpsys
+      # @return [Hash] hash containing the keys and values as distinguished by the supplied regex
       def self.process_dumpsys(regex_string, data)
         props = {}
         regex = Regexp.new(regex_string)
@@ -90,6 +97,9 @@ module DeviceAPI
         props
       end
 
+      # Get the 'power' information from dumpsys
+      # @param [String] serial serial number of device
+      # @return [Hash] hash containing power information from dumpsys
       def self.getpowerinfo(serial)
         lines = dumpsys(serial, 'power')
         process_dumpsys('(.*)=(.*)', lines)
@@ -215,11 +225,21 @@ module DeviceAPI
         return {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
       end
 
+      # Sends a key event to the specified device
+      # @param [String] serial serial number of device
+      # @param [String] keyevent keyevent to send to the device
       def self.keyevent(serial, keyevent)
         execute("adb -s #{serial} shell input keyevent #{keyevent}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
+      # Sends a swipe command to the specified device
+      # @param [String] serial serial number of the device
+      # @param [Hash] coords hash of coordinates to swipe from / to
+      # @option coords [String] :x_from (0) Coordinate to start from on the X axis
+      # @option coords [String] :x_to (0) Coordinate to end on on the X axis
+      # @option coords [String] :y_from (0) Coordinate to start from on the Y axis
+      # @option coords [String] :y_to (0) Coordinate to end on on the Y axis
       def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
         execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
