@@ -105,6 +105,17 @@ module DeviceAPI
         process_dumpsys('(.*)=(.*)', lines)
       end
 
+      def self.get_device_dpi(serial)
+        lines = dumpsys(serial, 'window')
+        dpi = nil
+        lines.each do |line|
+          if /sw(\d*)dp/.match(line)
+            dpi = Regexp.last_match[1]
+          end
+        end
+        dpi
+      end
+
       # Returns the 'dumpsys' information from the specified device
       # @param serial serial number of device
       # @return (Array) array of results from adb shell dumpsys
