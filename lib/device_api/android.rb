@@ -2,9 +2,12 @@
 require 'device_api/android/adb'
 require 'device_api/android/device'
 require 'device_api/android/signing'
-Dir[File.dirname(__FILE__) + '/android/plugins/*.rb'].each {|file| require file }
 
-Dir[File.dirname(__FILE__) + '/android/device/*.rb'].each {|file| require file }
+# Load plugins
+require 'device_api/android/plugins/memory'
+
+# Load additional device types
+require 'device_api/android/device/kindle'
 
 module DeviceAPI
   module Android
