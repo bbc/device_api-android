@@ -202,6 +202,12 @@ module DeviceAPI
         end
       end
 
+      # Returns wifi status and access point name
+      # @return [Hash] :status and :access_point
+      def wifi_status
+        ADB.wifi(serial)
+      end
+
       private
 
       def get_memory_info
@@ -245,10 +251,6 @@ module DeviceAPI
 
       def uninstall_apk(package_name)
         ADB.uninstall_apk(package_name: package_name, serial: serial)
-      end
-
-      def get_wifi_status
-        ADB.wifi(serial)
       end
 
       def get_dpi
