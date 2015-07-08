@@ -28,13 +28,13 @@ module DeviceAPI
           end
         end
 
-        attr_accessor :info, :apps, :processes, :mem_info
+        attr_accessor :processes, :mem_info
 
         def initialize(options = {})
-          @serial = options[:serial]
-          @info = options[:data] || ADB.dumpsys(@serial, 'meminfo')
+          serial = options[:serial]
+          info = options[:data] || ADB.dumpsys(serial, 'meminfo')
 
-          groups = @info.split('')
+          groups = info.split('')
 
           raise 'A different ADB result has been received' unless groups[1].first == 'Total PSS by process:'
           @processes = []
