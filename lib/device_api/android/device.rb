@@ -208,6 +208,14 @@ module DeviceAPI
         ADB.wifi(serial)
       end
 
+      def uptime
+        ADB.get_uptime(serial)
+      end
+
+      def battery_info_asim
+        ADB.get_battery_info(serial)
+      end
+
       private
 
       def get_memory_info
