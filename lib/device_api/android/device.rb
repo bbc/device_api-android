@@ -212,7 +212,7 @@ module DeviceAPI
         ADB.get_uptime(serial)
       end
 
-      def battery_info_asim
+      def battery_info
         ADB.get_battery_info(serial)
       end
 
