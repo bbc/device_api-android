@@ -208,10 +208,6 @@ module DeviceAPI
         ADB.wifi(serial)
       end
 
-      def uptime
-        ADB.get_uptime(serial)
-      end
-
       def battery_info
         ADB.get_battery_info(serial)
       end
