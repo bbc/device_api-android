@@ -208,6 +208,10 @@ module DeviceAPI
         ADB.wifi(serial)
       end
 
+      def battery_info
+        ADB.get_battery_info(serial)
+      end
+
       private
 
       def get_memory_info
