@@ -120,18 +120,8 @@ module DeviceAPI
       # @option options [String] :serial serial number of device
       # @return (String) return result from adb install command
       def self.install_apk(options = {})
-        apk = options[:apk]
-        serial = options[:serial]
-        result = execute("adb -s #{serial} install #{apk}")
-
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
-
-        lines = result.stdout.split("\n").map { |line| line.strip }
-        # lines.each do |line|
-        #  res=:success if line=='Success'
-        # end
-
-        lines.last
+        options[:action] = :install
+        change_apk(options)
       end
 
       # Uninstalls a specified package from a specified device
@@ -140,9 +130,26 @@ module DeviceAPI
       # @option options [String] :serial serial number of device
       # @return (String) return result from adb uninstall command
       def self.uninstall_apk(options = {})
+        options[:action] = :uninstall
+        change_apk(options)
+      end
+
+      def self.change_apk(options = {})
         package_name = options[:package_name]
+        apk = options[:apk]
         serial = options[:serial]
-        result = execute("adb -s #{serial} uninstall #{package_name}")
+        action = options[:action]
+
+        if action == :install
+          command = "adb -s #{serial} install #{apk}"
+        elsif action == :uninstall
+          command = "adb -s #{serial} uninstall #{package_name}"
+        else
+          raise ADBCommandError.new('No action specified')
+        end
+
+        result = execute(command)
+
         raise ADBCommandError.new(result.stderr) if result.exit != 0
 
         lines = result.stdout.split("\n").map { |line| line.strip }
