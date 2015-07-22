@@ -232,12 +232,8 @@ module DeviceAPI
       #   DeviceAPI::ADB.wifi(serial)
       def self.wifi(serial)
         result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
-        if result.exit != 0
-          raise ADBCommandError.new(result.stderr) 
-        else
-          result = {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')}
-        end
-        result  
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        return {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
       end
 
       # Sends a key event to the specified device
