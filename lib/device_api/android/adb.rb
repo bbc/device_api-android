@@ -121,7 +121,7 @@ module DeviceAPI
       # @return (Array) array of results from adb shell dumpsys
       def self.dumpsys(serial, command)
         result = execute("adb -s #{serial} shell dumpsys #{command}")
-       # raise ADBCommandError.new(result.stderr) if result.exit != 0
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
         result.stdout.split("\n").map { |line| line.strip }
       end
 
@@ -232,7 +232,7 @@ module DeviceAPI
       #   DeviceAPI::ADB.wifi(serial)
       def self.wifi(serial)
         result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+       # raise ADBCommandError.new(result.stderr) if result.exit != 0
         return {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
       end
 
