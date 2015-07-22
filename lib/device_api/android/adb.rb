@@ -235,7 +235,7 @@ module DeviceAPI
         if result.exit != 0
           raise ADBCommandError.new(result.stderr) 
         else
-          result = {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')} if result.exit == 0  
+          result = {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')}
         end
         result
       end
