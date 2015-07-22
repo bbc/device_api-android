@@ -140,12 +140,13 @@ module DeviceAPI
         serial = options[:serial]
         action = options[:action]
 
-        if action == :install
-          command = "adb -s #{serial} install #{apk}"
-        elsif action == :uninstall
-          command = "adb -s #{serial} uninstall #{package_name}"
-        else
-          raise ADBCommandError.new('No action specified')
+        case action
+          when :install
+            command = "adb -s #{serial} install #{apk}"
+          when :uninstall
+            command = "adb -s #{serial} uninstall #{package_name}"
+          else
+            raise ADBCommandError.new('No action specified')
         end
 
         result = execute(command)
