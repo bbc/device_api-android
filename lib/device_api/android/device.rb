@@ -212,6 +212,9 @@ module DeviceAPI
         ADB.get_battery_info(serial)
       end
 
+      # @param [String] command to start the intent
+      # Return the stdout of executed intent
+      # @return [String] stdout
       def start_intent(command)
         ADB.am(serial,command)
       end
