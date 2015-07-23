@@ -212,6 +212,10 @@ module DeviceAPI
         ADB.get_battery_info(serial)
       end
 
+      def start_intent(command)
+        ADB.am(serial,command)
+      end
+      
       private
 
       def get_memory_info
