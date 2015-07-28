@@ -135,4 +135,23 @@ _______________________________________________________
     end
   end
 
+   describe ".wifi" do
+    it "returns wifi info" do
+      out= <<_______________________________________________________
+mNetworkInfo [type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "TVMP-DevNet", roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: false]
+_______________________________________________________
+    allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+    expect( DeviceAPI::Android::ADB.wifi('12345').class).to eq(Hash)
+    end
+  end
+
+  describe ".am" do
+    it "returns the stdout" do
+      out= <<_______________________________________________________
+Starting: Intent { act=android.intent.action.MAIN cmp=com.android.settings/.wifi.WifiSettings }
+_______________________________________________________
+    allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+    expect( DeviceAPI::Android::ADB.am('03157df373208426' ,'12345').class).to eq(String)
+    end
+  end
 end
