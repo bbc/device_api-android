@@ -223,6 +223,7 @@ module DeviceAPI
 
       def get_memory_info
         @memory = DeviceAPI::Android::Plugin::Memory.new(serial: serial) unless @memory
+        @memory
       end
 
       def get_app_props(key)
