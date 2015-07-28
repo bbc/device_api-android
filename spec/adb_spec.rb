@@ -146,7 +146,7 @@ _______________________________________________________
   end
 
   describe ".am" do
-    it "" do
+    it "returns the stdout" do
       out= <<_______________________________________________________
 Starting: Intent { act=android.intent.action.MAIN cmp=com.android.settings/.wifi.WifiSettings }
 _______________________________________________________
