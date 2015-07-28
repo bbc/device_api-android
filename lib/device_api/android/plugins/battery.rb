@@ -1,28 +1,21 @@
 module DeviceAPI
   module Android
     module Plugin
-	class Battery
-   
-   	attr_accessor :battery
-	def initialize(options = {})
-		@battery = {}
-		props = {}
-		serial = options[:serial]
-		info = options[:data] || ADB.dumpsys(serial, 'battery')
-		info.each do |i|
-			key = i.split(": ")[0].gsub(" ","_")
-			props[key] = "#{i.split(": ")[1]}"
-		end
-		@battery[:currentTemp] = props["temperature"]
-		@battery[:maxTemp] = props["mBatteryMaxTemp"]
-		@battery[:maxCurrent] = props["mBatteryMaxCurrent"]
-		@battery[:voltage] = props["voltage"]
-		@battery[:level] = props["level"]
-		@battery[:health] = props["health"]
-		@battery[:status] = props["status"]
-	end
+	    class Battery
+   	    attr_accessor :current_temp, :max_temp, :max_current, :voltage, :level, :health, :status
 
-	end
+        def initialize(options = {})
+          serial = options[:serial]
+          props = ADB.get_battery_info(serial)
+          self.current_temp   = props["temperature"]
+          self.max_temp       = props["mBatteryMaxTemp"]
+          self.max_current    = props["mBatteryMaxCurrent"]
+          self.voltage        = props["voltage"]
+          self.level          = props["level"]
+          self.health         = props["health"]
+          self.status         = props["status"]
+        end
+      end
     end
   end
 end
