@@ -2,7 +2,7 @@ module DeviceAPI
   module Android
     module Plugin
       class Battery
-   	    attr_accessor :current_temp, :max_temp, :max_current, :voltage, :level, :health, :status
+        attr_accessor :current_temp, :max_temp, :max_current, :voltage, :level, :health, :status
 
         def initialize(options = {})
           serial = options[:serial]
