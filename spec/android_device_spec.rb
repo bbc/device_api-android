@@ -7,7 +7,7 @@ describe DeviceAPI::Android do
 
     it 'Returns an empty array when no devices are connected' do
       out = <<_______________________________________________________
-    List of devices attached
+List of devices attached
 
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
@@ -16,8 +16,8 @@ _______________________________________________________
 
     it "returns an array with a single item when there's one device attached" do
       out = <<_______________________________________________________
-    List of devices attached
-    SH34RW905290	device
+List of devices attached
+SH34RW905290	device
 
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
