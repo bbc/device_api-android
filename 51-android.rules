@@ -50,6 +50,8 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="1949", ATTR{idProduct}=="000b", MODE="0666", 
 SUBSYSTEM=="usb", ATTR{idVendor}=="1949", ATTR{idProduct}=="000c", MODE="0666", OWNER="hive"
 # Kindle Fire (Pink Case)
 SUBSYSTEM=="usb", ATTR{idVendor}=="1949", ATTR{idProduct}=="00f2", MODE="0666", OWNER="hive"
+# Kindle Fire HDX 8.9 (3rd Generation) OS 4.5.5
+SUBSYSTEM=="usb", ATTR{idVendor}=="1949", ATTR{idProduct}=="000d", mode="0666", OWNER="hive"
 # Sony Ericsson ST25i 
 SUBSYSTEM=="usb", ATTR{idVendor}=="0fce", ATTR{idProduct}=="5171", MODE="0666", OWNER="hive"
 # Galaxy S2/S3
