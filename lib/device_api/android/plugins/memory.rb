@@ -8,7 +8,7 @@ module DeviceAPI
 
         # Class used for holding process information
         class MemInfo
-          attr_accessor :process, :memory, :pid
+          attr_reader :process, :memory, :pid
           def initialize(options = {})
             @process = options[:process]
             @memory = options[:memory]
@@ -37,7 +37,7 @@ module DeviceAPI
         end
 
         def process_data(memory_info)
-          groups = memory_info.split('')
+          groups = memory_info.chunk { |a| a == '' }.reject { |a,_| a  }.map { |_,b| b }
 
           raise 'A different ADB result has been received' unless groups[1].first == 'Total PSS by process:'
           @processes = []
