@@ -57,7 +57,7 @@ module DeviceAPI
           data.each do |l|
             if /Tuning:\s+(.*)/.match(l)
               ram_info['tuning'] = Regexp.last_match[1]
-            elsif /(.*):\s([0-9]*\s[a-zA-Z]*)/.match(l)
+            elsif /(.*):\s(-?[0-9]*\s[a-zA-Z]*)/.match(l)
               ram_info[Regexp.last_match[1].downcase] = Regexp.last_match[2]
             end
           end
