@@ -218,6 +218,11 @@ module DeviceAPI
       def start_intent(command)
         ADB.am(serial,command)
       end
+
+      #Reboots the device
+      def reboot
+        ADB.reboot(serial)
+      end
       
       private
 
