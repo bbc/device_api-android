@@ -223,8 +223,19 @@ module DeviceAPI
       def reboot
         ADB.reboot(serial)
       end
+
+      # Returns disk status
+      # @return [Hash] containing disk statistics
+      def diskstat
+        get_disk_info
+      end
       
       private
+
+      def get_disk_info
+        @diskstat = DeviceAPI::Android::Plugin::Disk.new(serial: serial) unless @diskstat
+        @diskstat.process_stats      
+      end
 
       def get_memory_info
         @memory = DeviceAPI::Android::Plugin::Memory.new(serial: serial) unless @memory
