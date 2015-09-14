@@ -222,8 +222,24 @@ module DeviceAPI
       def start_intent(command)
         ADB.am(serial,command)
       end
+
+      #Reboots the device
+      def reboot
+        ADB.reboot(serial)
+      end
+
+      # Returns disk status
+      # @return [Hash] containing disk statistics
+      def diskstat
+        get_disk_info
+      end
       
       private
+
+      def get_disk_info
+        @diskstat = DeviceAPI::Android::Plugin::Disk.new(serial: serial) unless @diskstat
+        @diskstat.process_stats      
+      end
 
       def get_battery_info
         @battery = DeviceAPI::Android::Plugin::Battery.new(serial: serial) unless @battery

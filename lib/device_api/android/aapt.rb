@@ -26,23 +26,7 @@ module DeviceAPI
 
         fail result.stderr if result.exit != 0
 
-        lines = result.stdout.split("\n")
-        results = []
-        lines.each do |l|
-          if /(.*): (.*)/.match(l)
-            # results.push(Regexp.last_match[1].strip => Regexp.last_match[2].strip)
-            values = {}
-
-            Regexp.last_match[2].strip.split(' ').each do |item| # split on an spaces
-              item = item.to_s.tr('\'', '') # trim off any excess single quotes
-              values[item.split('=')[0]] = item.split('=')[1] # split on the = and create a new hash
-            end
-
-            results << {Regexp.last_match[1].strip => values} # append the result tp new_result
-
-          end
-        end
-        results
+        result.stdout.scan(/(.*): (.*)/).map { |a,b| { a => Hash[b.split(' ').map { |c| c.tr('\'','').split('=') }] } }
       end
 
     end

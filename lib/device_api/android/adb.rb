@@ -18,17 +18,7 @@ module DeviceAPI
         result = execute_with_timeout_and_retry('adb devices')
 
         raise ADBCommandError.new(result.stderr) if result.exit != 0
-
-        lines = result.stdout.split("\n")
-        results = []
-
-        lines.shift # Drop the message line
-        lines.each do |l|
-          if /(.*)\t(.*)/.match(l)
-            results.push(Regexp.last_match[1].strip => Regexp.last_match[2].strip)
-          end
-        end
-        results
+        result.stdout.scan(/(.*)\t(.*)/).map { |a,b| {a => b}}
       end
 
       # Retrieve device state for a single device
