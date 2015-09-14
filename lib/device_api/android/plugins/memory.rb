@@ -8,7 +8,7 @@ module DeviceAPI
 
         # Class used for holding process information
         class MemInfo
-          attr_accessor :process, :memory, :pid
+          attr_reader :process, :memory, :pid
           def initialize(options = {})
             @process = options[:process]
             @memory = options[:memory]
@@ -31,15 +31,23 @@ module DeviceAPI
         attr_accessor :processes, :mem_info
 
         def initialize(options = {})
-          serial = options[:serial]
-          info = options[:data] || ADB.dumpsys(serial, 'meminfo')
+          @serial = options[:serial]
+          info = options[:data] || ADB.dumpsys(@serial, 'meminfo')
+          process_data(info)
+        end
 
-          groups = info.split('')
+        def process_data(memory_info)
+          groups = memory_info.chunk { |a| a == '' }.reject { |a,_| a  }.map { |_,b| b }
 
           raise 'A different ADB result has been received' unless groups[1].first == 'Total PSS by process:'
           @processes = []
           process_total_pss_by_process(groups[1])
           process_ram_info(groups[4])
+        end
+
+        def update
+          meminfo = ADB.dumpsys(@serial, 'meminfo')
+          process_data(meminfo)
         end
 
         # Processes memory used by each running process

@@ -174,6 +174,10 @@ module DeviceAPI
         get_memory_info
       end
 
+      def battery
+        get_battery_info
+      end
+
       # Check if the devices screen is currently turned on
       # @return [Boolean] true if the screen is on, otherwise false
       def screen_on?
@@ -237,8 +241,14 @@ module DeviceAPI
         @diskstat.process_stats      
       end
 
+      def get_battery_info
+        @battery = DeviceAPI::Android::Plugin::Battery.new(serial: serial) unless @battery
+        @battery
+      end
+
       def get_memory_info
         @memory = DeviceAPI::Android::Plugin::Memory.new(serial: serial) unless @memory
+        @memory
       end
 
       def get_app_props(key)
@@ -264,9 +274,6 @@ module DeviceAPI
         ADB.getpowerinfo(serial)
       end
 
-      def get_battery_info
-        ADB.get_battery_info(serial)
-      end
 
       def get_phoneinfo
         ADB.getphoneinfo(serial)

@@ -5,6 +5,7 @@ require 'device_api/android/signing'
 
 # Load plugins
 require 'device_api/android/plugins/memory'
+require 'device_api/android/plugins/battery'
 require 'device_api/android/plugins/disk'
 
 # Load additional device types
