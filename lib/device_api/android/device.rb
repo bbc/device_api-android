@@ -233,6 +233,11 @@ module DeviceAPI
       def diskstat
         get_disk_info
       end
+
+      # Returns the device uptime
+      def uptime
+        ADB.get_uptime(serial)
+      end
       
       private
 
