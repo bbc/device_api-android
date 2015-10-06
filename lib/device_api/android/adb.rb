@@ -242,7 +242,7 @@ module DeviceAPI
       # @param [String] serial serial number of device
       # @param [String] keyevent keyevent to send to the device
       def self.keyevent(serial, keyevent)
-        execute("adb -s #{serial} shell input keyevent #{keyevent}")
+        result = execute("adb -s #{serial} shell input keyevent #{keyevent}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
