@@ -15,11 +15,12 @@ module DeviceAPI
   module Android
     # Returns array of connected android devices
     def self.devices
-      ADB.devices.map do |d|
-        if d.keys.first && !d.keys.first.include?('?')
+      list = ADB.devices.map do |d|
+        if d.keys.first && !d.keys.first.include?('?') && !d.values.first.include?('unauthorized')
           DeviceAPI::Android::Device.create( self.get_device_type(d.keys.first), { serial: d.keys.first, state: d.values.first } )
         end
       end
+      list.compact
     end
 
     # Retrieve an Device object by serial id
