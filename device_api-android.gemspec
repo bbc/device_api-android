@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = 'Android Device Management API'
   s.description = 'Android implementation of DeviceAPI'
-  s.authors     = ['David Buckhurst','Jitesh Gosai', 'Jon Wilson']
+  s.authors     = ['David Buckhurst','Jitesh Gosai', 'Asim Khan', 'Jon Wilson']
   s.email       = 'david.buckhurst@bbc.co.uk'
   s.files       = Dir['README.md', 'lib/**/*.rb']
   s.homepage    = 'https://github.com/bbc/device_api-android'
