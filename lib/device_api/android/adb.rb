@@ -42,7 +42,7 @@ module DeviceAPI
 
         raise ADBCommandError.new(result.stderr) if result.exit != 0
 
-        lines = result.stdout.encode('UTF-8', invalid: :replace).split("\n")
+        lines = result.stdout.encode('UTF-16', 'UTF-8', invalid: :replace, replace: '').encode('UTF-8', 'UTF-16').split("\n")
 
         process_dumpsys('\[(.*)\]:\s+\[(.*)\]', lines)
       end
