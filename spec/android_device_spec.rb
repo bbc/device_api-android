@@ -1,4 +1,6 @@
 require 'device_api/android'
+require_relative 'helpers/stub_helper_spec'
+
 include RSpec
 
 describe DeviceAPI::Android do
@@ -28,6 +30,20 @@ _______________________________________________________
       expect(devices[0]).to be_a DeviceAPI::Android::Device
       expect(devices[0].serial).to eq('SH34RW905290')
       expect(devices[0].status).to eq(:ok)
+    end
+
+    it 'handles an untrusted device correctly' do
+      out = <<eof
+List of devices attached
+G090G8105387008L	unauthorized
+eof
+      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+
+      devices = DeviceAPI::Android.devices
+      expect(devices.count).to eq(1)
+      expect(devices[0]).to be_a DeviceAPI::Android::Device
+      expect(devices[0].serial).to eq('G090G8105387008L')
+      expect(devices[0].status).to eq(:unauthorized)
     end
   end
 
