@@ -35,7 +35,7 @@ module DeviceAPI
     def self.get_device_type(options)
       return :default if options.values.first == 'unauthorized'
       return :default if Device.new(serial: options.keys.first, state: options.values.first).manufacturer.nil?
-      case Device.new(serial: serial).manufacturer.downcase
+      case Device.new(serial: options.keys.first).manufacturer.downcase
         when 'amazon'
           type = :kindle
         else
