@@ -17,7 +17,7 @@ module DeviceAPI
     def self.devices
       ADB.devices.map do |d|
         if d.keys.first && !d.keys.first.include?('?')
-          DeviceAPI::Android::Device.create( self.get_device_type(d.keys.first), { serial: d.keys.first, state: d.values.first } )
+          DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: d.keys.first, state: d.values.first } )
         end
       end
     end
@@ -32,8 +32,9 @@ module DeviceAPI
     end
 
     # Return the device type used in determining which Device Object to create
-    def self.get_device_type(serial)
-      return :default if Device.new(serial: serial).manufacturer.nil?
+    def self.get_device_type(options)
+      return :default if options.values.first == 'unauthorized'
+      return :default if Device.new(serial: options.keys.first, state: options.values.first).manufacturer.nil?
       case Device.new(serial: serial).manufacturer.downcase
         when 'amazon'
           type = :kindle
