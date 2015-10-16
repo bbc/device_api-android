@@ -28,7 +28,7 @@ module DeviceAPI
         raise DeviceAPI::BadSerialString.new("serial was '#{serial.nil? ? 'nil' : serial}'")
       end
       state = ADB.get_state(serial)
-      DeviceAPI::Android::Device.create( self.get_device_type(serial),  { serial: serial, state: state })
+      DeviceAPI::Android::Device.create( self.get_device_type({serial: state}),  { serial: serial, state: state })
     end
 
     # Return the device type used in determining which Device Object to create
