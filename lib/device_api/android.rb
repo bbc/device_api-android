@@ -10,6 +10,7 @@ require 'device_api/android/plugins/disk'
 
 # Load additional device types
 require 'device_api/android/device/kindle'
+require 'device_api/android/device/samsung'
 
 module DeviceAPI
   module Android
@@ -38,6 +39,8 @@ module DeviceAPI
       case Device.new(serial: options.keys.first).manufacturer.downcase
         when 'amazon'
           type = :kindle
+        when 'samsung'
+          type = :samsung
         else
           type = :default
       end
