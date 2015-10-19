@@ -86,6 +86,14 @@ module DeviceAPI
         !get_battery_info.select { |keys| keys.include?('powered')}.select { |_,v| v == 'true' }.empty?
       end
 
+      def block_package(package)
+        if version < "5.0.0"
+          ADB.block_package(serial, package)
+        else
+          ADB.hide_package(serial, package)
+        end
+      end
+
       # Return the device orientation
       # @return (String) current device orientation
       def orientation
@@ -139,6 +147,11 @@ module DeviceAPI
         result = get_app_props('package')['name']
         fail StandardError, 'Package name not found', caller if result.nil?
         result
+      end
+
+      def list_installed_packages
+        packages = ADB.pm(serial, 'list packages')
+        packages.split("\r\n")
       end
 
       # Return the app version number for a specified apk
@@ -220,8 +233,8 @@ module DeviceAPI
       # @param [String] command to start the intent
       # Return the stdout of executed intent
       # @return [String] stdout
-      def start_intent(command)
-        ADB.am(serial,command)
+      def intent(command)
+        ADB.am(serial, command)
       end
 
       #Reboots the device

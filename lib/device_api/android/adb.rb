@@ -263,11 +263,39 @@ module DeviceAPI
       # @param serial serial number of device 
       # @param command -option activity 
       # @example
-      # DeviceAPI::ADB.am(serial, "-a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
+      # DeviceAPI::ADB.am(serial, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
       def self.am(serial, command)
-        result = execute("adb -s #{serial} shell am start #{command}")
+        result = execute("adb -s #{serial} shell am #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
         return result.stdout
+      end
+
+      # Package manager commands
+      # @param serial serial of device
+      # @param command command to issue to the package manager
+      # @example DeviceAPI::ADB.pm(serial, 'list packages')
+      def self.pm(serial, command)
+        result = execute("adb -s #{serial} shell pm #{command}")
+        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        return result.stdout
+      end
+
+      # Blocks a package, used on Android versions less than KitKat
+      # Returns boolean
+      # @param serial serial of device
+      # @param package to block
+      def self.block_package(serial, package)
+        result = pm(serial, "block #{package}")
+        result.include?('true')
+      end
+
+      # Blocks a package on KitKat and above
+      # Returns boolean
+      # @param serial serial of device
+      # @param package to hide
+      def self.hide_package(serial, package)
+        result = pm(serial, "hide #{package}")
+        result.include?('true')
       end
     end
 
