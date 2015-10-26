@@ -245,6 +245,9 @@ module DeviceAPI
         shell(serial, "input keyevent #{keyevent}")
       end
 
+      # ADB Shell command
+      # @param [String] serial serial number of device
+      # @param [String] command command to execute
       def self.shell(serial, command)
         result = execute("adb -s #{serial} shell #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
