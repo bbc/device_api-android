@@ -251,7 +251,7 @@ module DeviceAPI
       def self.shell(serial, command)
         result = execute("adb -s #{serial} shell #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
-        return result.stdout
+        result.stdout
       end
 
       # Sends a swipe command to the specified device
