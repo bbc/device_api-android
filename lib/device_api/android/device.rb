@@ -195,7 +195,8 @@ module DeviceAPI
       # Check if the devices screen is currently turned on
       # @return [Boolean] true if the screen is on, otherwise false
       def screen_on?
-        return true if get_powerinfo['mScreenOn'].to_s.downcase == 'true'
+        power = get_powerinfo
+        return true if power['mScreenOn'].to_s.downcase == 'true' || power['Display Power: state'].to_s.downcase == 'on'
         false
       end
 
