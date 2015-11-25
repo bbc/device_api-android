@@ -202,6 +202,16 @@ _______________________________________________________
               to raise_error(StandardError, 'aapt not found - please create a symlink in $ANDROID_HOME/tools')
         end
 
+        it 'can return the Wifi mac address' do
+          out = <<EOF
+lo       UP                                   127.0.0.1/8   0x00000049 00:00:00:00:00:00
+rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4c:c4:25:5b
+wlan0    UP                                     0.0.0.0/0   0x00001003 fc:c2:de:6a:04:9e
+EOF
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
+          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          expect(device.wifi_mac_address).to eq('fc:c2:de:6a:04:9e')
+        end
       end
     end
   end

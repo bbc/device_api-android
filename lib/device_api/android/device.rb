@@ -253,6 +253,13 @@ module DeviceAPI
       def uptime
         ADB.get_uptime(serial)
       end
+
+      # Returns the Wifi mac address
+      def wifi_mac_address
+        network = ADB.get_network_info(serial)
+        wifi = network.select { |a| a[:name] ==  'wlan0' }.first
+        wifi[:mac]
+      end
       
       private
 
