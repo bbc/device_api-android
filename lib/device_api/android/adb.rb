@@ -76,7 +76,7 @@ module DeviceAPI
         lines = execute("adb -s #{serial} shell netcfg")
         lines.stdout.split("\n").map do |a|
           b = a.split(" ")
-          { name: b[0], ip: b[2], mac: b[4] }
+          { name: b[0], ip: b[2].split('/')[0], mac: b[4] }
         end
       end
 
