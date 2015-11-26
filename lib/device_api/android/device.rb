@@ -264,7 +264,7 @@ module DeviceAPI
       # Returns the Wifi mac address
       def wifi_mac_address
         network = get_network_info
-        wifi = network.find { |a| a[:name] == 'wlan0' }
+        wifi = network.detect { |a| a[:name] == 'wlan0' }
         wifi[:mac]
       end
       
