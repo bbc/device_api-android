@@ -253,8 +253,26 @@ module DeviceAPI
       def uptime
         ADB.get_uptime(serial)
       end
+
+      # Returns the Wifi IP address
+      def ip_address
+        network = get_network_info
+        wlan0 = network.detect { |a| a[:name] == 'wlan0' }
+        wlan0[:ip]
+      end
+
+      # Returns the Wifi mac address
+      def wifi_mac_address
+        network = get_network_info
+        wifi = network.detect { |a| a[:name] == 'wlan0' }
+        wifi[:mac]
+      end
       
       private
+
+      def get_network_info
+        ADB.get_network_info(serial)
+      end
 
       def get_disk_info
         @diskstat = DeviceAPI::Android::Plugin::Disk.new(serial: serial) unless @diskstat

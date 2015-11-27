@@ -71,6 +71,15 @@ module DeviceAPI
         process_dumpsys('(.*):\s+(.*)', lines)
       end
 
+      # Get the network information
+      def self.get_network_info(serial)
+        lines = execute("adb -s #{serial} shell netcfg")
+        lines.stdout.split("\n").map do |a|
+          b = a.split(" ")
+          { name: b[0], ip: b[2].split('/')[0], mac: b[4] }
+        end
+      end
+
       # Processes the results from dumpsys to format them into a hash
       # @param [String] regex_string regex string used to separate the results from the keys
       # @param [Array] data data returned from dumpsys
