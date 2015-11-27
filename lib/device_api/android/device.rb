@@ -271,7 +271,7 @@ module DeviceAPI
       private
 
       def get_network_info
-        @network || @network = ADB.get_network_info(serial)
+        ADB.get_network_info(serial)
       end
 
       def get_disk_info
