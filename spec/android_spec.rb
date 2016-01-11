@@ -223,6 +223,17 @@ EOF
           allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
           expect(device.ip_address).to eq('192.168.1.1')
         end
+
+        it 'will not crash if Wifi is not enabled' do
+          out = <<EOF
+lo       UP                                   127.0.0.1/8   0x00000049 00:00:00:00:00:00
+rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4c:c4:25:5b
+EOF
+
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
+          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          expect { device.wifi_mac_address }.to_not raise_error
+        end
       end
     end
   end
