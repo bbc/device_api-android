@@ -4,6 +4,7 @@ require 'device_api/android/device'
 require 'device_api/android/signing'
 
 # Load plugins
+require 'device_api/android/plugins/audio'
 require 'device_api/android/plugins/memory'
 require 'device_api/android/plugins/battery'
 require 'device_api/android/plugins/disk'

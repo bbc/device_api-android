@@ -258,14 +258,14 @@ module DeviceAPI
       def ip_address
         network = get_network_info
         wlan0 = network.detect { |a| a[:name] == 'wlan0' }
-        wlan0[:ip]
+        wlan0[:ip] unless wlan0.nil?
       end
 
       # Returns the Wifi mac address
       def wifi_mac_address
         network = get_network_info
         wifi = network.detect { |a| a[:name] == 'wlan0' }
-        wifi[:mac]
+        wifi[:mac] unless wifi.nil?
       end
       
       private
