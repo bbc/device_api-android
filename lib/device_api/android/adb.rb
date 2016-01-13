@@ -251,8 +251,16 @@ module DeviceAPI
       # @param [String] serial serial number of device
       # @param [String] keyevent keyevent to send to the device
       def self.keyevent(serial, keyevent)
-        result = execute("adb -s #{serial} shell input keyevent #{keyevent}")
+        shell(serial, "input keyevent #{keyevent}")
+      end
+
+      # ADB Shell command
+      # @param [String] serial serial number of device
+      # @param [String] command command to execute
+      def self.shell(serial, command)
+        result = execute("adb -s #{serial} shell #{command}")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
+        result.stdout
       end
 
       # Sends a swipe command to the specified device
@@ -263,8 +271,7 @@ module DeviceAPI
       # @option coords [String] :y_from (0) Coordinate to start from on the Y axis
       # @option coords [String] :y_to (0) Coordinate to end on on the Y axis
       def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
-        result = execute("adb -s #{serial} shell input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        shell(serial, "input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
       end
 
       # Starts intent using adb 
@@ -274,9 +281,7 @@ module DeviceAPI
       # @example
       # DeviceAPI::ADB.am(serial, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
       def self.am(serial, command)
-        result = execute("adb -s #{serial} shell am #{command}")
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
-        return result.stdout
+        shell(serial, "am #{command}")
       end
 
       # Package manager commands
@@ -284,9 +289,7 @@ module DeviceAPI
       # @param command command to issue to the package manager
       # @example DeviceAPI::ADB.pm(serial, 'list packages')
       def self.pm(serial, command)
-        result = execute("adb -s #{serial} shell pm #{command}")
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
-        return result.stdout
+        shell(serial, "pm #{command}")
       end
 
       # Blocks a package, used on Android versions less than KitKat
