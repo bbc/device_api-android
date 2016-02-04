@@ -1,7 +1,5 @@
+require 'spec_helper'
 require 'device_api/android'
-require_relative 'helpers/stub_helper_spec'
-
-include RSpec
 
 describe DeviceAPI::Android do
 
