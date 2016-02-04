@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/bbc/device_api-android'
   s.license     = 'MIT'
   s.add_runtime_dependency 'device_api', '>=1.0', '<2.0'
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec', '~> 3'
 end

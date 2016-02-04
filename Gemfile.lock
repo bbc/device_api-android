@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    device_api-android (1.2.1)
+      device_api (>= 1.0, < 2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -21,5 +27,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  device_api (>= 1.0.0)
-  rspec
+  device_api-android!
+  rspec (~> 3)
+
+BUNDLED WITH
+   1.10.6

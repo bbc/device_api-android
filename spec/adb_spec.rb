@@ -1,9 +1,7 @@
-$LOAD_PATH.unshift('./lib/')
+require 'spec_helper'
 
 require 'device_api'
 require 'device_api/android/adb'
-
-include RSpec
 
 #
 #
