@@ -8,7 +8,7 @@ describe DeviceAPI::Android::Device do
       it 'Returns model name' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 
-        allow(Open3).to receive(:capture3) { ['[ro.product.model]: [HTC One]\n', '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { ['[ro.product.model]: [HTC One]\n', '', STATUS_OK] }
         expect(device.model).to eq('HTC One')
       end
 
@@ -17,7 +17,7 @@ describe DeviceAPI::Android::Device do
     describe '.orientation' do
       it 'Returns portrait when device is portrait' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 0\r\n", '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 0\r\n", '', STATUS_OK] }
 
         expect(device.orientation).
             to eq(:portrait)
@@ -25,7 +25,7 @@ describe DeviceAPI::Android::Device do
 
       it 'Returns landscape when device is landscape' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 1\r\n", '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 1\r\n", '', STATUS_OK] }
 
         expect(device.orientation).
             to eq(:landscape)
@@ -33,7 +33,7 @@ describe DeviceAPI::Android::Device do
 
       it 'Returns landscape when device is landscape for a kindle Fire' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 3\r\n", '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 3\r\n", '', STATUS_OK] }
 
         expect(device.orientation).
             to eq(:landscape)
@@ -42,7 +42,7 @@ describe DeviceAPI::Android::Device do
       it 'Returns an error if response not understood' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 
-        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 564654654\n", '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { ["SurfaceOrientation: 564654654\n", '', STATUS_OK] }
 
         expect { device.orientation }.
           to raise_error(StandardError, 'Device orientation not returned got: 564654654.')
@@ -51,7 +51,7 @@ describe DeviceAPI::Android::Device do
       it 'Returns an error if no device found' do
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
 
-        allow(Open3).to receive(:capture3) { ["error: device not found\n", '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { ["error: device not found\n", '', STATUS_OK] }
 
         expect { device.orientation }.
             to raise_error(StandardError, 'No output returned is there a device connected?')
@@ -62,10 +62,10 @@ describe DeviceAPI::Android::Device do
         landscape = "SurfaceOrientation: 1\r\n"
         portrait = "SurfaceOrientation: 0\r\n"
 
-        allow(Open3).to receive(:capture3) { [portrait, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [portrait, '', STATUS_OK] }
         expect(device.orientation).
             to eq(:portrait)
-        allow(Open3).to receive(:capture3) { [landscape, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [landscape, '', STATUS_OK] }
         expect(device.orientation).
             to eq(:landscape)
       end
@@ -86,7 +86,7 @@ logicalFrame=[0, 0, 768, 1280], physicalFrame=[0, 0, 768, 1280], deviceSize=[768
      YScale: 0.500\r\n        XPrecision: 2.000\r\n        YPrecision: 2.000\r\n
 _______________________________________________________
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
 
         expect(device.orientation).
             to eq(:portrait)
@@ -105,7 +105,7 @@ _______________________________________________________
 _______________________________________________________
 
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
         expect(device.install('some_apk.spk')).
             to eq(:success)
       end
@@ -114,7 +114,7 @@ _______________________________________________________
         out = "can't find 'fake.apk' to install"
 
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
         expect { device.install('fake.apk') }.
             to raise_error(StandardError, "can't find 'fake.apk' to install")
       end
@@ -123,7 +123,7 @@ _______________________________________________________
         out = 'No apk specified.'
 
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
         expect { device.install('fake.apk') }.
             to raise_error(StandardError, 'No apk specified.')
       end
@@ -132,7 +132,7 @@ _______________________________________________________
         out = 'Failure [INSTALL_FAILED_ALREADY_EXISTS]'
 
         device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-        allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+        allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
         expect { device.install('fake.apk') }.
             to raise_error(StandardError, 'Failure [INSTALL_FAILED_ALREADY_EXISTS]')
       end
@@ -143,7 +143,7 @@ _______________________________________________________
           out = 'Success'
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect(device.uninstall('pack_name')).
               to eq(:success)
         end
@@ -152,7 +152,7 @@ _______________________________________________________
           out = 'Failure'
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect { device.uninstall('pack_name') }.
               to raise_error(StandardError, "Unable to install 'package_name' Error Reported: Failure")
         end
@@ -165,14 +165,14 @@ _______________________________________________________
         it 'Can get the package name from an apk' do
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect(device.package_name('iplayer.apk')).
             to eq('bbc.iplayer.android')
         end
 
         it 'Can get the version number from an apk' do
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect(device.app_version_number('iplayer.apk')).
               to eq('4.2.0.66')
         end
@@ -181,7 +181,7 @@ _______________________________________________________
           out = "package: versionCode='4200066' versionName='4.2.0.66'"
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect { device.package_name('iplayer.apk') }.
               to raise_error(StandardError, 'Package name not found')
         end
@@ -190,14 +190,14 @@ _______________________________________________________
           out = "package: name='bbc.iplayer.android' yyyyy='xxxxxxxx' qqqqq='rrrrrrrr'"
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect { device.app_version_number('iplayer.apk') }.
               to raise_error(StandardError, 'Version number not found')
         end
 
         it 'can raise an error if aapt can not be found' do
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { ['', '', $STATUS_ONE] }
+          allow(Open3).to receive(:capture3) { ['', '', STATUS_ERROR] }
           expect { device.app_version_number('iplayer.apk') }.
               to raise_error(StandardError, 'aapt not found - please create a symlink in $ANDROID_HOME/tools')
         end
@@ -209,7 +209,7 @@ rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4
 wlan0    UP                                     0.0.0.0/0   0x00001003 fc:c2:de:6a:04:9e
 EOF
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect(device.wifi_mac_address).to eq('fc:c2:de:6a:04:9e')
         end
 
@@ -220,7 +220,7 @@ rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4
 wlan0    UP                                     192.168.1.1/0   0x00001003 fc:c2:de:6a:04:9e
 EOF
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect(device.ip_address).to eq('192.168.1.1')
         end
 
@@ -231,7 +231,7 @@ rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4
 EOF
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
-          allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
           expect { device.wifi_mac_address }.to_not raise_error
         end
       end

@@ -16,7 +16,7 @@ List of devices attached
 
 eos
       allow(Open3).to receive(:capture3) {
-        [out, '', $STATUS_ZERO]
+        [out, '', STATUS_OK]
       }
       expect(DeviceAPI::Android::ADB.devices).to eq([])
     end
@@ -27,7 +27,7 @@ List of devices attached
 SH34RW905290	device
 
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
       expect(DeviceAPI::Android::ADB.devices).to eq([{ 'SH34RW905290' => 'device' }])
     end
 
@@ -38,7 +38,7 @@ SH34RW905290	device
 123456324	no device
 
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
       expect(DeviceAPI::Android::ADB.devices).to eq([{ 'SH34RW905290' => 'device' }, { '123456324' => 'no device' }])
     end
     
@@ -49,12 +49,12 @@ _______________________________________________________
 List of devices attached
 SH34RW905290	device
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
       expect(DeviceAPI::Android::ADB.devices).to eq([{ 'SH34RW905290' => 'device' }])
     end
 
     it 'can deal with no devices connected' do
-      allow(Open3).to receive(:capture3) { ["error: device not found\n", '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { ["error: device not found\n", '', STATUS_OK] }
       expect(DeviceAPI::Android::ADB.devices).to be_empty
     end
   end
@@ -64,7 +64,7 @@ _______________________________________________________
       out = <<_______________________________________________________
 12307.23 48052.0
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [ out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [ out, '', STATUS_OK] }
       expect( DeviceAPI::Android::ADB.get_uptime('SH34RW905290')).to eq( 12307 )
     end
   end
@@ -92,22 +92,21 @@ _______________________________________________________
 [ro.sf.lcd_density]: [480]
 ________________________________________________________
 
-      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
 
       props = DeviceAPI::Android::ADB.getprop('SH34RW905290')
 
       expect(props).to be_a Hash
       expect(props['ro.product.model']).to eq('HTC One')
     end
-  end
-  
-  describe ".get_status" do
+
+  describe ".get_state" do
     
     it "Returns a state for a single device" do
       out = <<_______________________________________________________
 device
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
     
       state = DeviceAPI::Android::ADB.get_state('SH34RW905290')
     
@@ -127,7 +126,7 @@ Events injected: 3082
 ** System appears to have crashed at event 3082 of 5000000 using seed 1409644708681
   end
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
  
       expect( DeviceAPI::Android::ADB.monkey( '1234323', :events => 5000, :package => 'my.app.package' )).to be_a OpenStruct
     end
@@ -138,7 +137,7 @@ _______________________________________________________
       out= <<_______________________________________________________
 mNetworkInfo [type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: "TVMP-DevNet", roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: false]
 _______________________________________________________
-    allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+    allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
     expect( DeviceAPI::Android::ADB.wifi('12345').class).to eq(Hash)
     end
   end
@@ -148,7 +147,7 @@ _______________________________________________________
       out= <<_______________________________________________________
 Starting: Intent { act=android.intent.action.MAIN cmp=com.android.settings/.wifi.WifiSettings }
 _______________________________________________________
-    allow(Open3).to receive(:capture3) { [out, '', $STATUS_ZERO] }
+    allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
     expect( DeviceAPI::Android::ADB.am('03157df373208426' ,'12345').class).to eq(String)
     end
   end
