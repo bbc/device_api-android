@@ -67,6 +67,22 @@ _______________________________________________________
       allow(Open3).to receive(:capture3) { [ out, '', STATUS_OK] }
       expect( DeviceAPI::Android::ADB.get_uptime('SH34RW905290')).to eq( 12307 )
     end
+
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.get_uptime('SH34RW905290')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.get_uptime('SH34RW905290')}.to raise_error(DeviceAPI::DeviceNotFound)
+    end
   end
   
   describe ".getprop" do
@@ -100,6 +116,23 @@ ________________________________________________________
       expect(props['ro.product.model']).to eq('HTC One')
     end
 
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.getprop('SH34RW905290')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.getprop('SH34RW905290')}.to raise_error(DeviceAPI::DeviceNotFound)
+    end
+  end
+  
   describe ".get_state" do
     
     it "Returns a state for a single device" do
@@ -130,6 +163,22 @@ _______________________________________________________
  
       expect( DeviceAPI::Android::ADB.monkey( '1234323', :events => 5000, :package => 'my.app.package' )).to be_a OpenStruct
     end
+
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.monkey('SH34RW905290', package: 'my.lovely.app')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.monkey('SH34RW905290', package: 'my.lovely.app')}.to raise_error(DeviceAPI::DeviceNotFound)
+    end
   end
 
    describe ".wifi" do
@@ -140,6 +189,22 @@ _______________________________________________________
     allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
     expect( DeviceAPI::Android::ADB.wifi('12345').class).to eq(Hash)
     end
+
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.wifi('SH34RW905290')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.wifi('SH34RW905290')}.to raise_error(DeviceAPI::DeviceNotFound)
+    end
   end
 
   describe ".am" do
@@ -149,6 +214,60 @@ Starting: Intent { act=android.intent.action.MAIN cmp=com.android.settings/.wifi
 _______________________________________________________
     allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
     expect( DeviceAPI::Android::ADB.am('03157df373208426' ,'12345').class).to eq(String)
+    end
+  end
+
+  describe "#get_network_info" do
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.get_network_info('SH34RW905290')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.get_network_info('SH34RW905290')}.to raise_error(DeviceAPI::DeviceNotFound)
+    end
+  end
+
+  describe "#dumpsys" do
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.dumpsys('SH34RW905290', 'dreams')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.dumpsys('SH34RW905290', 'dreams')}.to raise_error(DeviceAPI::DeviceNotFound)
+    end
+  end
+  
+  describe "#screencap" do
+    it 'raises an UnauthorizedDevice exception' do
+      err = <<ERR
+error: device unauthorized. Please check the confirmation dialog on your device.
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.screencap('SH34RW905290', filename: '/tmp/filename.png')}.to raise_error(DeviceAPI::UnauthorizedDevice)
+    end
+
+    it 'raises a DeviceNotFound exception' do
+      err = <<ERR
+error: device not found
+ERR
+      allow(Open3).to receive(:capture3) { ['', err, STATUS_ERROR ] }
+      expect{DeviceAPI::Android::ADB.screencap('SH34RW905290', filename: '/tmp/filename.png')}.to raise_error(DeviceAPI::DeviceNotFound)
     end
   end
 end
