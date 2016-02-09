@@ -38,9 +38,7 @@ module DeviceAPI
       # @param serial serial number of device
       # @return (Hash) hash containing device properties
       def self.getprop(serial)
-        result = execute("adb -s #{serial} shell getprop")
-
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        result = shell(serial, 'getprop')
 
         lines = result.stdout.encode('UTF-16', 'UTF-8', invalid: :replace, replace: '').encode('UTF-8', 'UTF-16').split("\n")
 
@@ -73,7 +71,7 @@ module DeviceAPI
 
       # Get the network information
       def self.get_network_info(serial)
-        lines = execute("adb -s #{serial} shell netcfg")
+        lines = shell(serial, 'netcfg')
         lines.stdout.split("\n").map do |a|
           b = a.split(" ")
           { name: b[0], ip: b[2].split('/')[0], mac: b[4] }
@@ -119,8 +117,7 @@ module DeviceAPI
       # @param serial serial number of device
       # @return (Array) array of results from adb shell dumpsys
       def self.dumpsys(serial, command)
-        result = execute("adb -s #{serial} shell dumpsys #{command}")
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        result = shell(serial, "dumpsys #{command}")
         result.stdout.split("\n").map { |line| line.strip }
       end
 
@@ -172,9 +169,7 @@ module DeviceAPI
       # @param serial serial number of device
       # @return (Float) uptime in seconds
       def self.get_uptime(serial)
-        result = execute("adb -s #{serial} shell cat /proc/uptime")
-
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        result = shell(serial, 'cat /proc/uptime')
 
         lines = result.stdout.split("\n")
         uptime = 0
@@ -210,11 +205,11 @@ module DeviceAPI
         seed = args[:seed]
         throttle = args[:throttle]
 
-        cmd = "adb -s #{serial} shell monkey -p #{package} -v #{events}"
+        cmd = "monkey -p #{package} -v #{events}"
         cmd = cmd + " -s #{seed}" if seed
         cmd = cmd + " -t #{throttle}" if throttle
 
-        execute(cmd)
+        shell(serial, cmd)
       end
       
       # Take a screenshot from the device
@@ -228,9 +223,9 @@ module DeviceAPI
         filename = args[:filename] or raise "filename not provided (:filename => '/tmp/myfile.png')"
         
         convert_carriage_returns = %q{perl -pe 's/\x0D\x0A/\x0A/g'}
-        cmd = "adb -s #{serial} shell screencap -p | #{convert_carriage_returns} > #{filename}"
+        cmd = "screencap -p | #{convert_carriage_returns} > #{filename}"
         
-        execute(cmd)
+        shell(serial, cmd)
       end
 
       # Returns wifi status and access point name
@@ -238,20 +233,16 @@ module DeviceAPI
       # @example
       #   DeviceAPI::ADB.wifi(serial)
       def self.wifi(serial)
-        result = execute("adb -s #{serial} shell dumpsys wifi | grep mNetworkInfo")
-        if result.exit != 0
-          raise ADBCommandError.new(result.stderr) 
-        else
-          result = {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')}
-        end
-        result
+        result = shell(serial, 'dumpsys wifi | grep mNetworkInfo')
+
+        {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')}
       end
 
       # Sends a key event to the specified device
       # @param [String] serial serial number of device
       # @param [String] keyevent keyevent to send to the device
       def self.keyevent(serial, keyevent)
-        shell(serial, "input keyevent #{keyevent}")
+        shell(serial, "input keyevent #{keyevent}").stdout
       end
 
       # ADB Shell command
@@ -259,8 +250,17 @@ module DeviceAPI
       # @param [String] command command to execute
       def self.shell(serial, command)
         result = execute("adb -s #{serial} shell #{command}")
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
-        result.stdout
+
+        case result.stderr
+        when /^error: device unauthorized./
+          raise DeviceAPI::UnauthorizedDevice, result.stderr
+        when /^error: device not found/
+          raise DeviceAPI::DeviceNotFound, result.stderr
+        else
+          raise ADBCommandError.new(result.stderr)
+        end if result.exit != 0
+
+        result
       end
 
       # Sends a swipe command to the specified device
@@ -271,7 +271,7 @@ module DeviceAPI
       # @option coords [String] :y_from (0) Coordinate to start from on the Y axis
       # @option coords [String] :y_to (0) Coordinate to end on on the Y axis
       def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
-        shell(serial, "input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}")
+        shell(serial, "input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}").stdout
       end
 
       # Starts intent using adb 
@@ -281,7 +281,7 @@ module DeviceAPI
       # @example
       # DeviceAPI::ADB.am(serial, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
       def self.am(serial, command)
-        shell(serial, "am #{command}")
+        shell(serial, "am #{command}").stdout
       end
 
       # Package manager commands
@@ -289,7 +289,7 @@ module DeviceAPI
       # @param command command to issue to the package manager
       # @example DeviceAPI::ADB.pm(serial, 'list packages')
       def self.pm(serial, command)
-        shell(serial, "pm #{command}")
+        shell(serial, "pm #{command}").stdout
       end
 
       # Blocks a package, used on Android versions less than KitKat
@@ -309,6 +309,8 @@ module DeviceAPI
         result = pm(serial, "hide #{package}")
         result.include?('true')
       end
+
+
     end
 
     # ADB Error class
@@ -317,7 +319,6 @@ module DeviceAPI
         super(msg)
       end
     end
-
 
   end
 end
