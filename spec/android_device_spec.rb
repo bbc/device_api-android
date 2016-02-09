@@ -10,7 +10,7 @@ describe DeviceAPI::Android do
 List of devices attached
 
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
       expect(DeviceAPI::Android.devices).to eq([])
     end
 
@@ -20,7 +20,7 @@ List of devices attached
 SH34RW905290	device
 
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
 
       devices = DeviceAPI::Android.devices
 
@@ -35,7 +35,7 @@ _______________________________________________________
 List of devices attached
 G090G8105387008L	unauthorized
 eof
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
 
       devices = DeviceAPI::Android.devices
       expect(devices.count).to eq(1)
@@ -51,7 +51,7 @@ eof
       out = <<_______________________________________________________
     device
 _______________________________________________________
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
 
       device = DeviceAPI::Android.device('SH34RW905290')
       expect(device).to be_a DeviceAPI::Android::Device

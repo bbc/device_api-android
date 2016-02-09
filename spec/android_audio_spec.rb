@@ -10,7 +10,7 @@ describe DeviceAPI::Android::Plugin::Audio do
           Mute count: 0
           Current: 2: 19, 40000000: 7,
       EOF
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
       audio = DeviceAPI::Android::Plugin::Audio.new('B0180706345401F5')
       expect(audio.volume).to eq(100)
     end
@@ -31,7 +31,7 @@ describe DeviceAPI::Android::Plugin::Audio do
           Current: 2: #{volumes.keys[random].to_s}, 400000000: 7,
       EOF
 
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
       audio = DeviceAPI::Android::Plugin::Audio.new('B0180706345401F5')
       expect(audio.volume).to eq(volumes.values[random])
     end
@@ -42,7 +42,7 @@ describe DeviceAPI::Android::Plugin::Audio do
           Mute count: 1
           Current: 2: 0, 40000000: 7,
       EOF
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
       audio = DeviceAPI::Android::Plugin::Audio.new('1234567890')
       expect(audio.is_muted?).to eq(true)
     end
@@ -54,7 +54,7 @@ describe DeviceAPI::Android::Plugin::Audio do
           Mute count: 0
           Current: 2: 0, 40000000: 7,
       EOF
-      allow(Open3).to receive(:capture3) { [out, '', STATUS_OK] }
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
       audio = DeviceAPI::Android::Plugin::Audio.new('1234567890')
       expect(audio.volume).to eq(0)
     end
