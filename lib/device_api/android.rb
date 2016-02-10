@@ -36,8 +36,13 @@ module DeviceAPI
     # Return the device type used in determining which Device Object to create
     def self.get_device_type(options)
       return :default if options.values.first == 'unauthorized'
-      return :default if Device.new(serial: options.keys.first, state: options.values.first).manufacturer.nil?
-      case Device.new(serial: options.keys.first).manufacturer.downcase
+      begin
+        man = Device.new(serial: options.keys.first, state: options.values.first).manufacturer
+      rescue DeviceAPI::DeviceNotFound
+        return :default
+      end
+      return :default if man.nil?
+      case man.downcase
         when 'amazon'
           type = :kindle
         when 'samsung'
