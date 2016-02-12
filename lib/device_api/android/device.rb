@@ -298,12 +298,7 @@ module DeviceAPI
 
       def get_prop(key)
         if !@props || !@props[key]
-          begin
-            @props = ADB.getprop(serial)
-          rescue
-            @props ||= {}
-            @props[key] = 'unknown'
-          end
+          @props = ADB.getprop(serial)
         end
         @props[key]
       end
