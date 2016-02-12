@@ -1,13 +1,13 @@
 PATH
   remote: .
   specs:
-    device_api-android (1.2.1)
-      device_api (>= 1.0, < 2.0)
+    device_api-android (1.2.4)
+      device_api (~> 1.0.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    device_api (1.0.1)
+    device_api (1.0.2)
     diff-lcs (1.2.5)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)

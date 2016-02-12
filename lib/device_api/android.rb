@@ -40,6 +40,11 @@ module DeviceAPI
         man = Device.new(serial: options.keys.first, state: options.values.first).manufacturer
       rescue DeviceAPI::DeviceNotFound
         return :default
+      rescue => e
+        puts "Unrecognised exception whilst finding device '#{options.keys.first}' (state: #{options.values.first})"
+        puts e.message
+        puts e.backtrace.inspect
+        return :default
       end
       return :default if man.nil?
       case man.downcase
