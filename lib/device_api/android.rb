@@ -21,7 +21,7 @@ module DeviceAPI
         if d.keys.first && !d.keys.first.include?('?')
           DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: d.keys.first, state: d.values.first } )
         end
-      end
+      end.compact
     end
 
     # Retrieve an Device object by serial id
