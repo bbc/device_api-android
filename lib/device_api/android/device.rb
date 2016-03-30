@@ -36,7 +36,8 @@ module DeviceAPI
             'device' => :ok,
             'no device' => :dead,
             'offline' => :offline,
-            'unauthorized' => :unauthorized
+            'unauthorized' => :unauthorized,
+            'no_permissions' => :no_permissions
         }[@state]
       end
 
