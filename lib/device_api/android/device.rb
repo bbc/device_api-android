@@ -257,9 +257,14 @@ module DeviceAPI
 
       # Returns the Wifi IP address
       def ip_address
-        network = get_network_info
-        wlan0 = network.detect { |a| a[:name] == 'wlan0' }
-        wlan0[:ip] unless wlan0.nil?
+        interface = ADB.get_network_interface(serial, 'wlan0')
+        if interface.match(/ip (.*) mask/)
+          Regexp.last_match[1]
+        elsif interface.match(/inet addr:(.*)\s+Bcast/)
+          Regexp.last_match[1].strip
+        else
+          # No match, wifi down?
+        end
       end
 
       # Returns the Wifi mac address

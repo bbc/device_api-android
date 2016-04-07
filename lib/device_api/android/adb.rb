@@ -69,6 +69,11 @@ module DeviceAPI
         process_dumpsys('(.*):\s+(.*)', lines)
       end
 
+      def self.get_network_interface(serial, interface)
+        result = shell(serial, "ifconfig #{interface}")
+        result.stdout
+      end
+
       # Get the network information
       def self.get_network_info(serial)
         lines = shell(serial, 'netcfg')
