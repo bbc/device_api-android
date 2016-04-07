@@ -213,6 +213,23 @@ EOF
           expect(device.wifi_mac_address).to eq('fc:c2:de:6a:04:9e')
         end
 
+        it 'can return the Wifi mac address on an Android 6.0 and above device' do
+          out = <<-EOF
+wlan0     Link encap:Ethernet  HWaddr 00:9A:CD:5E:CC:40
+          inet addr:10.10.1.108  Bcast:10.10.255.255  Mask:255.255.0.0
+          inet6 addr: ff80::29a:cbdf:ff5f:cc40/64 Scope: Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:3132210 errors:0 dropped:2310977 overruns:0 frame:0
+          TX packets:87349 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:537224812 TX bytes:9711181
+          EOF
+
+          device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
+          allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
+          expect(device.wifi_mac_address).to eq('00:9A:CD:5E:CC:40')
+        end
+
         it 'will not crash if Wifi is not enabled' do
           out = <<EOF
 lo       UP                                   127.0.0.1/8   0x00000049 00:00:00:00:00:00
