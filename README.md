@@ -105,7 +105,7 @@ You should be presented with something similar to this:
             Bus 001 Device 011: ID 05c6:6765 Qualcomm, Inc.
             Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
             
-The important thing to note here is the Vendor ID and Product ID for the device. In the case of the above, the device is a Tesco Hudl (showing as an Archos device) with the combinded ID of 0e79:5009 - 0e79 is the Vendor ID while 5009 is the Product ID. Open the 51-android.rules file and add the following line:
+The important thing to note here is the Vendor ID and Product ID for the device. In the case of the above, the device is a Tesco Hudl (showing as an Archos device) with the combined ID of 0e79:5009 - 0e79 is the Vendor ID while 5009 is the Product ID. Open the 51-android.rules file and add the following line:
 
             SUBSYSTEM=="usb", ATTR{idVendor}=="0e79", ATTR{idProduct}=="5009", MODE="0666", OWNER="hive"
 
