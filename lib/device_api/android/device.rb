@@ -323,7 +323,6 @@ module DeviceAPI
         ADB.getpowerinfo(serial)
       end
 
-
       def get_phoneinfo
         ADB.getphoneinfo(serial)
       end

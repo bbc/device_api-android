@@ -1,6 +1,7 @@
 # Encoding: utf-8
 require 'device_api/android/adb'
 require 'device_api/android/device'
+require 'device_api/android/remote_device'
 require 'device_api/android/signing'
 
 # Load plugins
@@ -19,7 +20,12 @@ module DeviceAPI
     def self.devices
       ADB.devices.map do |d|
         if d.keys.first && !d.keys.first.include?('?')
-          DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: d.keys.first, state: d.values.first } )
+          token = d.keys.first
+          if token =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
+            DeviceAPI::Android::RemoteDevice.create( self.get_device_type(d), { serial: token, state: d.values.first } )
+          else
+            DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: token, state: d.values.first } )
+          end
         end
       end.compact
     end
@@ -33,6 +39,13 @@ module DeviceAPI
       DeviceAPI::Android::Device.create( self.get_device_type({ :"#{serial}" => state}),  { serial: serial, state: state })
     end
 
+    def self.connect(ipaddressandport)
+      ADB.connect(ipaddressandport)
+    end
+
+    def self.disconnect(ipaddressandport)
+      ADB.disconnect(ipaddressandport)
+    end
     # Return the device type used in determining which Device Object to create
     def self.get_device_type(options)
       return :default if options.values.first == 'unauthorized'

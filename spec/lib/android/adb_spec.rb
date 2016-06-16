@@ -1,5 +1,4 @@
 require 'spec_helper'
-
 require 'device_api'
 require 'device_api/android/adb'
 
@@ -132,7 +131,35 @@ ERR
       expect{DeviceAPI::Android::ADB.getprop('SH34RW905290')}.to raise_error(DeviceAPI::DeviceNotFound)
     end
   end
-  
+
+  describe ".connect" do
+    it "raises a ADBCommandError when it can't connect to IP address/port combination" do
+err = <<ERR
+unable to connect to 192.168.0.1:5555
+ERR
+      allow(Open3).to receive(:capture3) { ["", err, STATUS_ONE ] }
+      expect{DeviceAPI::Android::ADB.connect to raise_error(DeviceAPI::ADBCommandError)}
+   end
+
+    it "raises a DeviceAlreadyConnectedError when the device is already connected" do
+err = <<ERR
+already connected to 192.168.0.251:5555
+ERR
+      allow(Open3).to receive(:capture3) { ["", err, STATUS_ONE ] }
+      expect{DeviceAPI::Android::ADB.connect to raise_error(DeviceAPI::DeviceAlreadyConnectedError)}
+   end
+  end 
+
+  describe ".disconnect" do
+    it "raises a ADBCommandError when it can't connect to IP address/port combination" do
+err = <<ERR
+No such device 192.167.0.1:5555
+ERR
+      allow(Open3).to receive(:capture3) { ["", err, STATUS_ONE ] }
+      expect{DeviceAPI::Android::ADB.connect to raise_error(DeviceAPI::ADBCommandError)}
+   end
+  end
+
   describe ".get_state" do
     
     it "Returns a state for a single device" do
