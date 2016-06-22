@@ -19,7 +19,9 @@ module DeviceAPI
     def self.devices
       ADB.devices.map do |d|
         if d.keys.first && !d.keys.first.include?('?')
-          DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: d.keys.first, state: d.values.first } )
+          serial = d.keys.first
+          remote = check_if_remote_device?(serial)
+          DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: serial, state: d.values.first, remote: remote} )
         end
       end.compact
     end
@@ -30,18 +32,38 @@ module DeviceAPI
         raise DeviceAPI::BadSerialString.new("serial was '#{serial.nil? ? 'nil' : serial}'")
       end
       state = ADB.get_state(serial)
-      DeviceAPI::Android::Device.create( self.get_device_type({ :"#{serial}" => state}),  { serial: serial, state: state })
+      remote = check_if_remote_device?(serial)
+      DeviceAPI::Android::Device.create( self.get_device_type({ :"#{serial}" => state}),  { serial: serial, state: state, remote: remote })
+    end
+
+    def self.connect(ipaddress,port=5555)
+      ADB.connect(ipaddress,port)
+    end
+
+    def self.disconnect(ipaddress,port=5555)
+      ADB.disconnect(ipaddress,port)
+    end
+
+    def self.check_if_remote_device?(serial)
+      begin
+        ADB::check_ip_address(serial)
+        true
+      rescue ADBCommandError
+        false 
+      end 
     end
 
     # Return the device type used in determining which Device Object to create
     def self.get_device_type(options)
       return :default if options.values.first == 'unauthorized'
+      serial = options.keys.first
+      state = ADB.get_state(serial)
       begin
-        man = Device.new(serial: options.keys.first, state: options.values.first).manufacturer
+        man = Device.new(serial: serial, state: state).manufacturer
       rescue DeviceAPI::DeviceNotFound
         return :default
       rescue => e
-        puts "Unrecognised exception whilst finding device '#{options.keys.first}' (state: #{options.values.first})"
+        puts "Unrecognised exception whilst finding device '#{serial}' (state: #{options.values.first})"
         puts e.message
         puts e.backtrace.inspect
         return :default
@@ -57,9 +79,9 @@ module DeviceAPI
       end
       type
     end
-  end
 
   # Serial error class
-  class BadSerialString < StandardError
+    class BadSerialString < StandardError
+    end
   end
 end

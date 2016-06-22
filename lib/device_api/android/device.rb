@@ -27,6 +27,11 @@ module DeviceAPI
       def initialize(options = {})
         @serial = options[:serial]
         @state = options[:state]
+        @remote = options[:remote] ? true : false
+      end
+
+      def is_remote?
+        @remote || false
       end
 
       # Mapping of device status - used to provide a consistent status across platforms
@@ -39,6 +44,13 @@ module DeviceAPI
             'unauthorized' => :unauthorized,
             'no permissions' => :no_permissions
         }[@state]
+      end
+
+      def disconnect
+        unless is_remote?
+          raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{serial} when it is not a remote device")
+        end
+        ADB.disconnect(serial)
       end
 
       # Return the device range
@@ -278,7 +290,7 @@ module DeviceAPI
           wifi[:mac] unless wifi.nil?
         end
       end
-      
+
       private
 
       def get_network_info
@@ -323,7 +335,6 @@ module DeviceAPI
         ADB.getpowerinfo(serial)
       end
 
-
       def get_phoneinfo
         ADB.getphoneinfo(serial)
       end
@@ -340,5 +351,12 @@ module DeviceAPI
         ADB.get_device_dpi(serial)
       end
     end
+
+    class DeviceDisconnectedWhenNotARemoteDevice < StandardError
+      def initialize(msg)
+        super(msg)
+      end
+    end
+
   end
 end

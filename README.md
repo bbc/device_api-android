@@ -25,6 +25,34 @@ Try connecting an android device with usb, and run:
 
 You might need to set your device to developer mode, and turn on usb debugging so that the android debug bridge can detect your device.
 
+### Connecting and disconnecting from Remote Devices
+
+You can connect to devices via their IP address and port number. The syntax is:
+
+    DeviceAPI::Android.connect(<IP address>,<port number>=5555)
+
+This should add a device to the already connected devices, which you can query with DeviceAPI::Android.devices. You can disconnect from a device like so:
+
+    DeviceAPI::Android.disconnect(<IP address>,<port number>=5555)
+
+Once connected, the IP address and port number combination becomes the serial for the device, and you can execute commands such as adb shell through specifying the IP address/port number instead of the serial number. For both Android.connect and Android.disconnect, if port number is not specified, and ip address is only specified, port number defaults to 5555. (Note that Android.disconnect doesn't automagically disconnect you from a connection with a port number that is not 5555 when it is called without a port argument)
+
+You can also use the disconnect method on a Android device object, without any arguments to disconnect a device. It will throw an error if the device is not connected. 
+
+    device.disconnect
+
+You can use device.is_remote? to determine if the device is a remote device, e.g. it has a ipaddress and port as an adb serial, and can attempt to be connected to.
+
+    device.is_remote?
+
+DeviceAPI::Android::ADB::DeviceAlreadyConnectedError is raised when DeviceAPI::Android.connect is called on an already connected device.
+
+DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice is raised when we are attempting to call disconnect on a device that is not a remote device, e.g. it has no hope of being disconnected from.
+
+DeviceAPI::Android::ADBCommandError is raised when we cannot connect to a device, e.g. adb times out.
+
+DeviceAPI::Android::ADBCommandError is raised when we cannot disconnect from a device, e.g. adb times out or we were already disconnected.
+
 ### Detecting devices
 
 There are two methods for detecting devices:

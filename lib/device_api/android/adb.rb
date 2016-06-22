@@ -233,6 +233,30 @@ module DeviceAPI
         shell(serial, cmd)
       end
 
+      def self.connect(ipaddress, port = 5555)
+        ipaddressandport = "#{ipaddress}:#{port}"
+        check_ip_address(ipaddressandport)
+        cmd = "adb connect #{ipaddressandport}"
+        result = execute(cmd)
+        if result.stdout.to_s =~ /.*already connected to.*/
+          raise DeviceAlreadyConnectedError.new("Device #{ipaddressandport} already connected")
+        else 
+          unless result.stdout.to_s =~ /.*connected to.*/
+            raise ADBCommandError.new("Unable to adb connect to #{ipaddressandport} result was: #{result.stdout}")
+          end
+        end 
+      end
+
+      def self.disconnect(ipaddress, port = 5555)
+        ipaddressandport = "#{ipaddress}:#{port}"
+        check_ip_address(ipaddressandport)
+        cmd = "adb disconnect #{ipaddressandport}"
+        result = execute(cmd)
+        unless result.exit == 0
+          raise ADBCommandError.new("Unable to adb disconnect to #{ipaddressandport} result was: #{result.stdout}")
+        end
+      end
+
       # Returns wifi status and access point name
       # @param serial serial number of device
       # @example
@@ -254,8 +278,7 @@ module DeviceAPI
       # @param [String] serial serial number of device
       # @param [String] command command to execute
       def self.shell(serial, command)
-        result = execute("adb -s #{serial} shell #{command}")
-
+        result = execute("adb -s '#{serial}' shell #{command}")
         case result.stderr
         when /^error: device unauthorized./
           raise DeviceAPI::UnauthorizedDevice, result.stderr
@@ -315,11 +338,20 @@ module DeviceAPI
         result.include?('true')
       end
 
-
+      def self.check_ip_address(ipaddressandport)
+        unless ipaddressandport =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
+             raise ADBCommandError.new("Invalid IP address and port #{ipaddressandport}")
+        end
+      end
     end
 
     # ADB Error class
     class ADBCommandError < StandardError
+      def initialize(msg)
+        super(msg)
+      end
+    end
+    class DeviceAlreadyConnectedError < ADBCommandError
       def initialize(msg)
         super(msg)
       end
