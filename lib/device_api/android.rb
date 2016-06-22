@@ -20,7 +20,7 @@ module DeviceAPI
       ADB.devices.map do |d|
         if d.keys.first && !d.keys.first.include?('?')
           serial = d.keys.first
-          remote = check_if_remote_device(serial)
+          remote = check_if_remote_device?(serial)
           DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: serial, state: d.values.first, remote: remote} )
         end
       end.compact
@@ -32,7 +32,7 @@ module DeviceAPI
         raise DeviceAPI::BadSerialString.new("serial was '#{serial.nil? ? 'nil' : serial}'")
       end
       state = ADB.get_state(serial)
-      remote = check_if_remote_device(serial)
+      remote = check_if_remote_device?(serial)
       DeviceAPI::Android::Device.create( self.get_device_type({ :"#{serial}" => state}),  { serial: serial, state: state, remote: remote })
     end
 
@@ -44,7 +44,7 @@ module DeviceAPI
       ADB.disconnect(ipaddress,port)
     end
 
-    def self.check_if_remote_device(serial)
+    def self.check_if_remote_device?(serial)
       begin
         ADB::check_ip_address(serial)
         true
