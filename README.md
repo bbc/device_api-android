@@ -115,4 +115,4 @@ Change the Vendor and Product IDs where appropriate, also check that the owner m
 
 *DeviceAPI-Android* is available to everyone under the terms of the MIT open source licence. Take a look at the LICENSE file in the code.
 
-Copyright (c) 2015 BBC
+Copyright (c) 2016 BBC
