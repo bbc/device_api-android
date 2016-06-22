@@ -29,13 +29,27 @@ You might need to set your device to developer mode, and turn on usb debugging s
 
 You can connect to devices via their IP address and port number. The syntax is:
 
-  DeviceAPI::Android.connect('192.168.0.1:5555')
+  DeviceAPI::Android.connect(<IP address>,<port number>)
 
 This should add a device to the already connected devices, which you can query with DeviceAPI::Android.devices. You can disconnect from a device like so:
 
-  DeviceAPI::Android.disconnect('192.168.0.1:5555')
+  DeviceAPI::Android.disconnect(<IP address>,<port number>)
 
 Once connected, the IP address and port number combination becomes the serial for the device, and you can execute commands such as adb shell through specifying the IP address/port number instead of the serial number.
+
+You can also use the disconnect method on a Android device object, without any arguments to disconnect a device. It will throw an error if the device is not connected.
+  
+  device.disconnect
+
+You can use device.is_remote? to determine if the device is a remote device, e.g. it has a ipaddress and port as a adb serial.
+
+  device.is_remote
+
+DeviceAPI::Android::ADB::DeviceAlreadyConnectedError is raised when DeviceAPI::Android.connect is called on a connected device.
+
+DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice is raised when we are attempting to call disconnect on a device that is not connected.
+
+DeviceAPI::Android::ADBCommandError is raised when we cannot connect to a device, e.g. adb times out.
 
 ### Detecting devices
 

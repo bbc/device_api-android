@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'device_api/android'
+require 'device_api/android/device'
 
 describe DeviceAPI::Android do
 
@@ -59,5 +60,15 @@ _______________________________________________________
       expect(device.status).to eq(:ok)
     end
 
+    it "Throws a descriptive error when asked to disconnect a normal device" do
+      out = <<_______________________________________________________
+    device
+_______________________________________________________
+      allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
+      device = DeviceAPI::Android.device('SH34RW905291')
+      expect(device).to be_a DeviceAPI::Android::Device
+      expect(device.is_remote?).to eq(false)
+      expect{device.disconnect}.to raise_error(DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice)
+    end 
   end
 end

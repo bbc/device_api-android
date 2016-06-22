@@ -233,31 +233,27 @@ module DeviceAPI
         shell(serial, cmd)
       end
 
-      def self.check_ip_address(ipaddressandport)
-        unless ipaddressandport =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
-             raise ADBCommandError.new("Invalid IP address and port " + ipaddressandport)
-        end
-      end
-
-      def self.connect(ipaddressandport)
+      def self.connect(ipaddress, port = 5555)
+        ipaddressandport = "#{ipaddress}:#{port}"
         check_ip_address(ipaddressandport)
-        cmd = "adb connect " + ipaddressandport
+        cmd = "adb connect #{ipaddressandport}"
         result = execute(cmd)
         if result.stdout.to_s =~ /.*already connected to.*/
-          raise DeviceAlreadyConnectedError.new("Device " + ipaddressandport + " already connected")
-        elsif result.stdout.to_s =~ /.*connected to.*/
-          return
+          raise DeviceAlreadyConnectedError.new("Device #{ipaddressandport} already connected")
         else 
-          raise ADBCommandError.new("Unable to adb connect to " + ipaddressandport + " result was: " + result.stdout.inspect)
+          unless result.stdout.to_s =~ /.*connected to.*/
+            raise ADBCommandError.new("Unable to adb connect to #{ipaddressandport} result was: #{result.stdout}")
+          end
         end 
       end
 
-      def self.disconnect(ipaddressandport)
+      def self.disconnect(ipaddress, port = 5555)
+        ipaddressandport = "#{ipaddress}:#{port}"
         check_ip_address(ipaddressandport)
-        cmd = "adb disconnect " + ipaddressandport
+        cmd = "adb disconnect #{ipaddressandport}"
         result = execute(cmd)
         unless result.exit == 0
-          raise ADBCommandError.new("Unable to adb disconnect from " + ipaddressandport + " result was: " + result.stdout.inspect)
+          raise ADBCommandError.new("Unable to adb disconnect to #{ipaddressandport} result was: #{result.stdout}")
         end
       end
 
@@ -342,7 +338,11 @@ module DeviceAPI
         result.include?('true')
       end
 
-
+      def self.check_ip_address(ipaddressandport)
+        unless ipaddressandport =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
+             raise ADBCommandError.new("Invalid IP address and port #{ipaddressandport}")
+        end
+      end
     end
 
     # ADB Error class
