@@ -51,7 +51,7 @@ DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice is raised when we are
 
 DeviceAPI::Android::ADBCommandError is raised when we cannot connect to a device, e.g. adb times out.
 
-DeviceAPI::Android::ADBCommandError is raised when we cannot disconnect to a device, e.g. adb times out or we were already disconnected.
+DeviceAPI::Android::ADBCommandError is raised when we cannot disconnect from a device, e.g. adb times out or we were already disconnected.
 
 ### Detecting devices
 
