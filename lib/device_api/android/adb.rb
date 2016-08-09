@@ -298,8 +298,8 @@ module DeviceAPI
       # @option coords [String] :x_to (0) Coordinate to end on on the X axis
       # @option coords [String] :y_from (0) Coordinate to start from on the Y axis
       # @option coords [String] :y_to (0) Coordinate to end on on the Y axis
-      def self.swipe(serial, coords = {x_from: 0, x_to: 0, y_from: 0, y_to: 0 })
-        shell(serial, "input swipe #{coords[:x_from]} #{coords[:x_to]} #{coords[:y_from]} #{coords[:y_to]}").stdout
+      def self.swipe(serial, coords = {x_from: 0, y_from: 0, x_to: 0, y_to: 0 })
+        shell(serial, "input swipe #{coords[:x_from]} #{coords[:y_from]} #{coords[:x_to]} #{coords[:y_to]}").stdout
       end
 
       # Starts intent using adb 
