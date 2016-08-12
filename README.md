@@ -104,6 +104,7 @@ This allows you to setup a keystore with the options required by any testing fra
 ## Testing
 
 device_api-android is defended with unit and integration level rspec tests. You can run the tests with:
+
     bundle exec rspec
 
 ## Issues
