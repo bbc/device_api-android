@@ -1,6 +1,6 @@
 # DeviceAPI-Android
 
-*DeviceAPI-Android* is the android implementation of device_api -- an initiative to allow full automation of device activities.
+*DeviceAPI-Android* is the android implementation of device_api -- an initiative to allow full automation of device activities. For a full list of release notes, see the [change log](CHANGELOG.md)
 
 ## Dependencies
 
