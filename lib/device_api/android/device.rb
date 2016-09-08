@@ -45,6 +45,10 @@ module DeviceAPI
             'no permissions' => :no_permissions
         }[@state]
       end
+      
+      def connect(ip_address, port=5555)
+        ADB.connect(ip_address, port)
+      end
 
       def disconnect
         unless is_remote?

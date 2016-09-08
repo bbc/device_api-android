@@ -232,28 +232,43 @@ module DeviceAPI
         
         shell(serial, cmd)
       end
+      
+      # Connects to remote android device
+      # @param [String] ip_address or ip_address:port
+      # @example
+      #  DeviceAPI::ADB.connect(ip_address, port)  
+      #  DeviceAPI::ADB.connect(ip_address_and_port)
+      def self.connect(ip_address, port=5555)
 
-      def self.connect(ipaddress, port = 5555)
-        ipaddressandport = "#{ipaddress}:#{port}"
-        check_ip_address(ipaddressandport)
-        cmd = "adb connect #{ipaddressandport}"
+        hash = ip_address.split(":")
+        if hash[1].nil?
+          ip_address_and_port = "#{ip_address}:#{port}"
+        else
+          ip_address_and_port = ip_address
+        end
+
+        check_ip_address(ip_address_and_port)
+        cmd = "adb connect #{ip_address_and_port}"
         result = execute(cmd)
         if result.stdout.to_s =~ /.*already connected to.*/
-          raise DeviceAlreadyConnectedError.new("Device #{ipaddressandport} already connected")
+          raise DeviceAlreadyConnectedError.new("Device #{ip_address_and_port} already connected")
         else 
           unless result.stdout.to_s =~ /.*connected to.*/
-            raise ADBCommandError.new("Unable to adb connect to #{ipaddressandport} result was: #{result.stdout}")
+            raise ADBCommandError.new("Unable to adb connect to #{ip_address_and_port} result was: #{result.stdout}")
           end
         end 
       end
-
-      def self.disconnect(ipaddress, port = 5555)
-        ipaddressandport = "#{ipaddress}:#{port}"
-        check_ip_address(ipaddressandport)
-        cmd = "adb disconnect #{ipaddressandport}"
+    
+      # Disconnects from remote android device
+      # @param [String] ip_address:port
+      # @example
+      #  DeviceAPI::ADB.connect(ip_address_and_port) 
+      def self.disconnect(ip_address_and_port)
+        check_ip_address(ip_address_and_port)
+        cmd = "adb disconnect #{ip_address_and_port}"
         result = execute(cmd)
         unless result.exit == 0
-          raise ADBCommandError.new("Unable to adb disconnect to #{ipaddressandport} result was: #{result.stdout}")
+          raise ADBCommandError.new("Unable to adb disconnect to #{ip_address_and_port} result was: #{result.stdout}")
         end
       end
 
