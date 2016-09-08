@@ -240,8 +240,8 @@ module DeviceAPI
       #  DeviceAPI::ADB.connect(ip_address_and_port)
       def self.connect(ip_address, port=5555)
 
-        hash = ip_address.split(":")
-        if hash[1].nil?
+        value = ip_address.split(":").last
+        if value.nil?
           ip_address_and_port = "#{ip_address}:#{port}"
         else
           ip_address_and_port = ip_address
