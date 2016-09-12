@@ -234,19 +234,12 @@ module DeviceAPI
       end
       
       # Connects to remote android device
-      # @param [String] ip_address or ip_address:port
+      # @param [String] ip_address 
+      # @param [String] port
       # @example
       #  DeviceAPI::ADB.connect(ip_address, port)  
-      #  DeviceAPI::ADB.connect(ip_address_and_port)
       def self.connect(ip_address, port=5555)
-
-        value = ip_address.split(":").last
-        if value.nil?
-          ip_address_and_port = "#{ip_address}:#{port}"
-        else
-          ip_address_and_port = ip_address
-        end
-
+        ip_address_and_port = "#{ip_address}:#{port}"
         check_ip_address(ip_address_and_port)
         cmd = "adb connect #{ip_address_and_port}"
         result = execute(cmd)
@@ -260,10 +253,12 @@ module DeviceAPI
       end
     
       # Disconnects from remote android device
-      # @param [String] ip_address:port
+      # @param [String] ip_address
+      # @param [String] port
       # @example
-      #  DeviceAPI::ADB.connect(ip_address_and_port) 
-      def self.disconnect(ip_address_and_port)
+      #  DeviceAPI::ADB.disconnect(ip_address, port) 
+      def self.disconnect(ip_address, port=5555)
+        ip_address_and_port = "#{ip_address}:#{port}"
         check_ip_address(ip_address_and_port)
         cmd = "adb disconnect #{ip_address_and_port}"
         result = execute(cmd)
@@ -353,9 +348,9 @@ module DeviceAPI
         result.include?('true')
       end
 
-      def self.check_ip_address(ipaddressandport)
-        unless ipaddressandport =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
-             raise ADBCommandError.new("Invalid IP address and port #{ipaddressandport}")
+      def self.check_ip_address(ip_address_and_port)
+        unless ip_address_and_port =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
+             raise ADBCommandError.new("Invalid IP address and port #{ip_address_and_port}")
         end
       end
     end
