@@ -28,7 +28,14 @@ module DeviceAPI
         @serial = options[:serial]
         @state = options[:state]
         @remote = options[:remote] ? true : false
+        set_ip_and_port if @remote
       end
+
+      def set_ip_and_port
+        address = @serial.split(":")
+        @ip_address = address.first
+        @port = address.last
+      end     
 
       def is_remote?
         @remote || false
@@ -45,12 +52,16 @@ module DeviceAPI
             'no permissions' => :no_permissions
         }[@state]
       end
+      
+      def connect
+        ADB.connect(@ip_address, @port)
+      end
 
       def disconnect
         unless is_remote?
           raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{serial} when it is not a remote device")
         end
-        ADB.disconnect(serial)
+        ADB.disconnect(@ip_address, @port)
       end
 
       # Return the device range

@@ -232,28 +232,38 @@ module DeviceAPI
         
         shell(serial, cmd)
       end
-
-      def self.connect(ipaddress, port = 5555)
-        ipaddressandport = "#{ipaddress}:#{port}"
-        check_ip_address(ipaddressandport)
-        cmd = "adb connect #{ipaddressandport}"
+      
+      # Connects to remote android device
+      # @param [String] ip_address 
+      # @param [String] port
+      # @example
+      #  DeviceAPI::ADB.connect(ip_address, port)  
+      def self.connect(ip_address, port=5555)
+        ip_address_and_port = "#{ip_address}:#{port}"
+        check_ip_address(ip_address_and_port)
+        cmd = "adb connect #{ip_address_and_port}"
         result = execute(cmd)
         if result.stdout.to_s =~ /.*already connected to.*/
-          raise DeviceAlreadyConnectedError.new("Device #{ipaddressandport} already connected")
+          raise DeviceAlreadyConnectedError.new("Device #{ip_address_and_port} already connected")
         else 
           unless result.stdout.to_s =~ /.*connected to.*/
-            raise ADBCommandError.new("Unable to adb connect to #{ipaddressandport} result was: #{result.stdout}")
+            raise ADBCommandError.new("Unable to adb connect to #{ip_address_and_port} result was: #{result.stdout}")
           end
         end 
       end
-
-      def self.disconnect(ipaddress, port = 5555)
-        ipaddressandport = "#{ipaddress}:#{port}"
-        check_ip_address(ipaddressandport)
-        cmd = "adb disconnect #{ipaddressandport}"
+    
+      # Disconnects from remote android device
+      # @param [String] ip_address
+      # @param [String] port
+      # @example
+      #  DeviceAPI::ADB.disconnect(ip_address, port) 
+      def self.disconnect(ip_address, port=5555)
+        ip_address_and_port = "#{ip_address}:#{port}"
+        check_ip_address(ip_address_and_port)
+        cmd = "adb disconnect #{ip_address_and_port}"
         result = execute(cmd)
         unless result.exit == 0
-          raise ADBCommandError.new("Unable to adb disconnect to #{ipaddressandport} result was: #{result.stdout}")
+          raise ADBCommandError.new("Unable to adb disconnect to #{ip_address_and_port} result was: #{result.stdout}")
         end
       end
 
@@ -338,9 +348,9 @@ module DeviceAPI
         result.include?('true')
       end
 
-      def self.check_ip_address(ipaddressandport)
-        unless ipaddressandport =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
-             raise ADBCommandError.new("Invalid IP address and port #{ipaddressandport}")
+      def self.check_ip_address(ip_address_and_port)
+        unless ip_address_and_port =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
+             raise ADBCommandError.new("Invalid IP address and port #{ip_address_and_port}")
         end
       end
     end
