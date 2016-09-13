@@ -362,11 +362,11 @@ module DeviceAPI
       end
 
       def install_apk(apk)
-        ADB.install_apk(apk: apk, change_apk: qualifier)
+        ADB.install_apk(apk: apk, qualifier: qualifier)
       end
 
       def uninstall_apk(package_name)
-        ADB.uninstall_apk(package_name: package_name, change_apk: qualifier)
+        ADB.uninstall_apk(package_name: package_name, qualifier: qualifier)
       end
 
       def get_dpi
