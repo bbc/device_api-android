@@ -10,7 +10,7 @@ module DeviceAPI
     # Device class used for containing the accessors of the physical device information
     class Device < DeviceAPI::Device
       attr_accessor :qualifier
-      
+
       @@subclasses; @@subclasses = {}
 
       # Called by any inheritors to register themselves with the parent class
@@ -32,12 +32,8 @@ module DeviceAPI
         @remote = options[:remote] ? true : false
         if is_remote?
           set_ip_and_port
-          set_serial
+          @serial = self.serial_no
         end
-      end
-
-      def set_serial
-        @serial = self.serial_no
       end
 
       def set_ip_and_port
