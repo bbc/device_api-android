@@ -22,7 +22,7 @@ module DeviceAPI
       end
 
       # Retrieve device state for a single device
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (String) device state
       def self.get_state(qualifier)
         result = execute('adb get-state -s #{qualifier}')
@@ -35,7 +35,7 @@ module DeviceAPI
       end
 
       # Get the properties of a specified device
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (Hash) hash containing device properties
       def self.getprop(qualifier)
         result = shell(qualifier, 'getprop')
@@ -46,7 +46,7 @@ module DeviceAPI
       end
 
       # Get the 'input' information from dumpsys
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (Hash) hash containing input information from dumpsys
       def self.getdumpsys(qualifier)
         lines = dumpsys(qualifier, 'input')
@@ -54,7 +54,7 @@ module DeviceAPI
       end
 
       # Get the 'iphonesubinfo' from dumpsys
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (Hash) hash containing iphonesubinfo information from dumpsys
       def self.getphoneinfo(qualifier)
         lines = dumpsys(qualifier, 'iphonesubinfo')
@@ -62,7 +62,7 @@ module DeviceAPI
       end
 
       # Get the 'battery' information from dumpsys
-      # @param [String] qualifier qualifier number of device
+      # @param [String] qualifier qualifier of device
       # @return [Hash] hash containing battery information from dumpsys
       def self.get_battery_info(qualifier)
         lines = dumpsys(qualifier, 'battery')
@@ -100,7 +100,7 @@ module DeviceAPI
       end
 
       # Get the 'power' information from dumpsys
-      # @param [String] qualifier qualifier number of device
+      # @param [String] qualifier qualifier of device
       # @return [Hash] hash containing power information from dumpsys
       def self.getpowerinfo(qualifier)
         lines = dumpsys(qualifier, 'power')
@@ -119,7 +119,7 @@ module DeviceAPI
       end
 
       # Returns the 'dumpsys' information from the specified device
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (Array) array of results from adb shell dumpsys
       def self.dumpsys(qualifier, command)
         result = shell(qualifier, "dumpsys #{command}")
@@ -129,7 +129,7 @@ module DeviceAPI
       # Installs a specified apk to a specific device
       # @param [Hash] options the options used for installing an apk
       # @option options [String] :apk path to apk to install
-      # @option options [String] :qualifier qualifier number of device
+      # @option options [String] :qualifier qualifier of device
       # @return (String) return result from adb install command
       def self.install_apk(options = {})
         options[:action] = :install
@@ -139,7 +139,7 @@ module DeviceAPI
       # Uninstalls a specified package from a specified device
       # @param [Hash] options the options used for uninstalling a package
       # @option options [String] :package_name package to uninstall
-      # @option options [String] :qualifier qualifier number of device
+      # @option options [String] :qualifier qualifier of device
       # @return (String) return result from adb uninstall command
       def self.uninstall_apk(options = {})
         options[:action] = :uninstall
@@ -171,7 +171,7 @@ module DeviceAPI
       end
 
       # Returns the uptime of the specified device
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (Float) uptime in seconds
       def self.get_uptime(qualifier)
         result = shell(qualifier, 'cat /proc/uptime')
@@ -187,7 +187,7 @@ module DeviceAPI
       end
 
       # Reboots the specified device
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @return (nil) Nil if successful, otherwise an error is raised
       def self.reboot(qualifier)
         result = execute("adb -s #{qualifier} reboot")
@@ -195,7 +195,7 @@ module DeviceAPI
       end
 
       # Runs monkey testing
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @param [Hash] args hash of arguments used for starting testing
       # @option args [String] :events (10000) number of events to run
       # @option args [String] :package name of package to run the tests against
@@ -218,7 +218,7 @@ module DeviceAPI
       end
       
       # Take a screenshot from the device
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @param [Hash] args hash of arguments
       # @option args [String] :filename name (with full path) required to save the image
       # @example
@@ -268,7 +268,7 @@ module DeviceAPI
       end
 
       # Returns wifi status and access point name
-      # @param qualifier qualifier number of device
+      # @param qualifier qualifier of device
       # @example
       #   DeviceAPI::ADB.wifi(qualifier)
       def self.wifi(qualifier)
@@ -278,14 +278,14 @@ module DeviceAPI
       end
 
       # Sends a key event to the specified device
-      # @param [String] qualifier qualifier number of device
+      # @param [String] qualifier qualifier of device
       # @param [String] keyevent keyevent to send to the device
       def self.keyevent(qualifier, keyevent)
         shell(qualifier, "input keyevent #{keyevent}").stdout
       end
 
       # ADB Shell command
-      # @param [String] qualifier qualifier number of device
+      # @param [String] qualifier qualifier of device
       # @param [String] command command to execute
       def self.shell(qualifier, command)
         result = execute("adb -s '#{qualifier}' shell #{command}")
@@ -302,7 +302,7 @@ module DeviceAPI
       end
 
       # Sends a swipe command to the specified device
-      # @param [String] qualifier qualifier number of the device
+      # @param [String] qualifier qualifier of the device
       # @param [Hash] coords hash of coordinates to swipe from / to
       # @option coords [String] :x_from (0) Coordinate to start from on the X axis
       # @option coords [String] :x_to (0) Coordinate to end on on the X axis
@@ -314,7 +314,7 @@ module DeviceAPI
 
       # Starts intent using adb 
       # Returns stdout
-      # @param qualifier qualifier number of device 
+      # @param qualifier qualifier of device 
       # @param command -option activity 
       # @example
       # DeviceAPI::ADB.am(qualifier, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
