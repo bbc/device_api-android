@@ -9,7 +9,7 @@ module DeviceAPI
   module Android
     # Device class used for containing the accessors of the physical device information
     class Device < DeviceAPI::Device
-      attr_accessor :qualifier
+      attr_reader :qualifier
 
       @@subclasses; @@subclasses = {}
 
