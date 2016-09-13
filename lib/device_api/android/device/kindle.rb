@@ -6,11 +6,11 @@ module DeviceAPI
       # you can unlock that device by broadcasting a 'WakeUp' intent. On Kindle devices, this does not
       # work due to Amazons implementation of the Keyguard.
       def unlock
-        ADB.keyevent(serial, '26') unless screen_on?
+        ADB.keyevent(qualifier, '26') unless screen_on?
         if orientation == :landscape
-          ADB.swipe(serial, { x_from: 500, y_from: 575, x_to: 500, y_to: 250 } )
+          ADB.swipe(qualifier, { x_from: 500, y_from: 575, x_to: 500, y_to: 250 } )
         else
-          ADB.swipe(serial, { x_from: 300, y_from: 900, x_to: 300, y_to: 600 } )
+          ADB.swipe(qualifier, { x_from: 300, y_from: 900, x_to: 300, y_to: 600 } )
         end
       end
     end

@@ -3,14 +3,14 @@ module DeviceAPI
     module Plugin
       class Audio
 
-        attr_reader :serial
+        attr_reader :qualifier
 
         def initialize(options)
-          @serial = options #[:serial]
+          @qualifier = options #[:serial]
         end
 
         def get_volume_steps
-          audio = ADB.dumpsys( @serial, 'audio' )
+          audio = ADB.dumpsys( @qualifier, 'audio' )
           vol_steps = audio.detect { |a| a.include?('volume steps:') }
           return nil if vol_steps.nil?
 
@@ -58,12 +58,12 @@ module DeviceAPI
 
         def change_volume(op, key)
           op.times do
-            ADB.keyevent(@serial, key )
+            ADB.keyevent(@qualifier, key )
           end
         end
 
         def get_system_volume
-          audio = ADB.dumpsys( @serial, 'audio' )
+          audio = ADB.dumpsys( @qualifier, 'audio' )
           index = audio.index('- STREAM_SYSTEM:')
 
           return nil if index.nil?
