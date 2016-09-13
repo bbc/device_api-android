@@ -22,10 +22,10 @@ module DeviceAPI
       end
 
       # Retrieve device state for a single device
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (String) device state
-      def self.get_state(serial)
-        result = execute('adb get-state -s #{serial}')
+      def self.get_state(qualifier)
+        result = execute('adb get-state -s #{qualifier}')
 
         raise ADBCommandError.new(result.stderr) if result.exit != 0
 
@@ -35,10 +35,10 @@ module DeviceAPI
       end
 
       # Get the properties of a specified device
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (Hash) hash containing device properties
-      def self.getprop(serial)
-        result = shell(serial, 'getprop')
+      def self.getprop(qualifier)
+        result = shell(qualifier, 'getprop')
 
         lines = result.stdout.encode('UTF-16', 'UTF-8', invalid: :replace, replace: '').encode('UTF-8', 'UTF-16').split("\n")
 
@@ -46,37 +46,37 @@ module DeviceAPI
       end
 
       # Get the 'input' information from dumpsys
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (Hash) hash containing input information from dumpsys
-      def self.getdumpsys(serial)
-        lines = dumpsys(serial, 'input')
+      def self.getdumpsys(qualifier)
+        lines = dumpsys(qualifier, 'input')
         process_dumpsys('(.*):\s+(.*)', lines)
       end
 
       # Get the 'iphonesubinfo' from dumpsys
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (Hash) hash containing iphonesubinfo information from dumpsys
-      def self.getphoneinfo(serial)
-        lines = dumpsys(serial, 'iphonesubinfo')
+      def self.getphoneinfo(qualifier)
+        lines = dumpsys(qualifier, 'iphonesubinfo')
         process_dumpsys('(.*) =\s+(.*)', lines)
       end
 
       # Get the 'battery' information from dumpsys
-      # @param [String] serial serial number of device
+      # @param [String] qualifier qualifier of device
       # @return [Hash] hash containing battery information from dumpsys
-      def self.get_battery_info(serial)
-        lines = dumpsys(serial, 'battery')
+      def self.get_battery_info(qualifier)
+        lines = dumpsys(qualifier, 'battery')
         process_dumpsys('(.*):\s+(.*)', lines)
       end
 
-      def self.get_network_interface(serial, interface)
-        result = shell(serial, "ifconfig #{interface}")
+      def self.get_network_interface(qualifier, interface)
+        result = shell(qualifier, "ifconfig #{interface}")
         result.stdout
       end
 
       # Get the network information
-      def self.get_network_info(serial)
-        lines = shell(serial, 'netcfg')
+      def self.get_network_info(qualifier)
+        lines = shell(qualifier, 'netcfg')
         lines.stdout.split("\n").map do |a|
           b = a.split(" ")
           { name: b[0], ip: b[2].split('/')[0], mac: b[4] }
@@ -100,15 +100,15 @@ module DeviceAPI
       end
 
       # Get the 'power' information from dumpsys
-      # @param [String] serial serial number of device
+      # @param [String] qualifier qualifier of device
       # @return [Hash] hash containing power information from dumpsys
-      def self.getpowerinfo(serial)
-        lines = dumpsys(serial, 'power')
+      def self.getpowerinfo(qualifier)
+        lines = dumpsys(qualifier, 'power')
         process_dumpsys('(.*)=(.*)', lines)
       end
 
-      def self.get_device_dpi(serial)
-        lines = dumpsys(serial, 'window')
+      def self.get_device_dpi(qualifier)
+        lines = dumpsys(qualifier, 'window')
         dpi = nil
         lines.each do |line|
           if /sw(\d*)dp/.match(line)
@@ -119,17 +119,17 @@ module DeviceAPI
       end
 
       # Returns the 'dumpsys' information from the specified device
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (Array) array of results from adb shell dumpsys
-      def self.dumpsys(serial, command)
-        result = shell(serial, "dumpsys #{command}")
+      def self.dumpsys(qualifier, command)
+        result = shell(qualifier, "dumpsys #{command}")
         result.stdout.split("\n").map { |line| line.strip }
       end
 
       # Installs a specified apk to a specific device
       # @param [Hash] options the options used for installing an apk
       # @option options [String] :apk path to apk to install
-      # @option options [String] :serial serial number of device
+      # @option options [String] :qualifier qualifier of device
       # @return (String) return result from adb install command
       def self.install_apk(options = {})
         options[:action] = :install
@@ -139,7 +139,7 @@ module DeviceAPI
       # Uninstalls a specified package from a specified device
       # @param [Hash] options the options used for uninstalling a package
       # @option options [String] :package_name package to uninstall
-      # @option options [String] :serial serial number of device
+      # @option options [String] :qualifier qualifier of device
       # @return (String) return result from adb uninstall command
       def self.uninstall_apk(options = {})
         options[:action] = :uninstall
@@ -149,14 +149,14 @@ module DeviceAPI
       def self.change_apk(options = {})
         package_name = options[:package_name]
         apk = options[:apk]
-        serial = options[:serial]
+        qualifier = options[:qualifier]
         action = options[:action]
 
         case action
           when :install
-            command = "adb -s #{serial} install #{apk}"
+            command = "adb -s #{qualifier} install #{apk}"
           when :uninstall
-            command = "adb -s #{serial} uninstall #{package_name}"
+            command = "adb -s #{qualifier} uninstall #{package_name}"
           else
             raise ADBCommandError.new('No action specified')
         end
@@ -171,10 +171,10 @@ module DeviceAPI
       end
 
       # Returns the uptime of the specified device
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (Float) uptime in seconds
-      def self.get_uptime(serial)
-        result = shell(serial, 'cat /proc/uptime')
+      def self.get_uptime(qualifier)
+        result = shell(qualifier, 'cat /proc/uptime')
 
         lines = result.stdout.split("\n")
         uptime = 0
@@ -187,23 +187,23 @@ module DeviceAPI
       end
 
       # Reboots the specified device
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @return (nil) Nil if successful, otherwise an error is raised
-      def self.reboot(serial)
-        result = execute("adb -s #{serial} reboot")
+      def self.reboot(qualifier)
+        result = execute("adb -s #{qualifier} reboot")
         raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
       # Runs monkey testing
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @param [Hash] args hash of arguments used for starting testing
       # @option args [String] :events (10000) number of events to run
       # @option args [String] :package name of package to run the tests against
       # @option args [String] :seed pass the seed number (optional)
       # @option args [String] :throttle throttle value (optional)
       # @example
-      #   DeviceAPI::ADB.monkey( serial, :package => 'my.lovely.app' )
-      def self.monkey(serial, args)
+      #   DeviceAPI::ADB.monkey( qualifier, :package => 'my.lovely.app' )
+      def self.monkey(qualifier, args)
 
         events = args[:events] || 10000
         package = args[:package] or raise "package name not provided (:package => 'bbc.iplayer')"
@@ -214,23 +214,23 @@ module DeviceAPI
         cmd = cmd + " -s #{seed}" if seed
         cmd = cmd + " -t #{throttle}" if throttle
 
-        shell(serial, cmd)
+        shell(qualifier, cmd)
       end
       
       # Take a screenshot from the device
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @param [Hash] args hash of arguments
       # @option args [String] :filename name (with full path) required to save the image
       # @example
-      #   DeviceAPI::ADB.screenshot( serial, :filename => '/tmp/filename.png' )
-      def self.screencap( serial, args )
+      #   DeviceAPI::ADB.screenshot( qualifier, :filename => '/tmp/filename.png' )
+      def self.screencap( qualifier, args )
         
         filename = args[:filename] or raise "filename not provided (:filename => '/tmp/myfile.png')"
         
         convert_carriage_returns = %q{perl -pe 's/\x0D\x0A/\x0A/g'}
         cmd = "screencap -p | #{convert_carriage_returns} > #{filename}"
         
-        shell(serial, cmd)
+        shell(qualifier, cmd)
       end
       
       # Connects to remote android device
@@ -268,27 +268,27 @@ module DeviceAPI
       end
 
       # Returns wifi status and access point name
-      # @param serial serial number of device
+      # @param qualifier qualifier of device
       # @example
-      #   DeviceAPI::ADB.wifi(serial)
-      def self.wifi(serial)
-        result = shell(serial, 'dumpsys wifi | grep mNetworkInfo')
+      #   DeviceAPI::ADB.wifi(qualifier)
+      def self.wifi(qualifier)
+        result = shell(qualifier, 'dumpsys wifi | grep mNetworkInfo')
 
         {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')}
       end
 
       # Sends a key event to the specified device
-      # @param [String] serial serial number of device
+      # @param [String] qualifier qualifier of device
       # @param [String] keyevent keyevent to send to the device
-      def self.keyevent(serial, keyevent)
-        shell(serial, "input keyevent #{keyevent}").stdout
+      def self.keyevent(qualifier, keyevent)
+        shell(qualifier, "input keyevent #{keyevent}").stdout
       end
 
       # ADB Shell command
-      # @param [String] serial serial number of device
+      # @param [String] qualifier qualifier of device
       # @param [String] command command to execute
-      def self.shell(serial, command)
-        result = execute("adb -s '#{serial}' shell #{command}")
+      def self.shell(qualifier, command)
+        result = execute("adb -s '#{qualifier}' shell #{command}")
         case result.stderr
         when /^error: device unauthorized./
           raise DeviceAPI::UnauthorizedDevice, result.stderr
@@ -302,49 +302,49 @@ module DeviceAPI
       end
 
       # Sends a swipe command to the specified device
-      # @param [String] serial serial number of the device
+      # @param [String] qualifier qualifier of the device
       # @param [Hash] coords hash of coordinates to swipe from / to
       # @option coords [String] :x_from (0) Coordinate to start from on the X axis
       # @option coords [String] :x_to (0) Coordinate to end on on the X axis
       # @option coords [String] :y_from (0) Coordinate to start from on the Y axis
       # @option coords [String] :y_to (0) Coordinate to end on on the Y axis
-      def self.swipe(serial, coords = {x_from: 0, y_from: 0, x_to: 0, y_to: 0 })
-        shell(serial, "input swipe #{coords[:x_from]} #{coords[:y_from]} #{coords[:x_to]} #{coords[:y_to]}").stdout
+      def self.swipe(qualifier, coords = {x_from: 0, y_from: 0, x_to: 0, y_to: 0 })
+        shell(qualifier, "input swipe #{coords[:x_from]} #{coords[:y_from]} #{coords[:x_to]} #{coords[:y_to]}").stdout
       end
 
       # Starts intent using adb 
       # Returns stdout
-      # @param serial serial number of device 
+      # @param qualifier qualifier of device 
       # @param command -option activity 
       # @example
-      # DeviceAPI::ADB.am(serial, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
-      def self.am(serial, command)
-        shell(serial, "am #{command}").stdout
+      # DeviceAPI::ADB.am(qualifier, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
+      def self.am(qualifier, command)
+        shell(qualifier, "am #{command}").stdout
       end
 
       # Package manager commands
-      # @param serial serial of device
+      # @param qualifier qualifier of device
       # @param command command to issue to the package manager
-      # @example DeviceAPI::ADB.pm(serial, 'list packages')
-      def self.pm(serial, command)
-        shell(serial, "pm #{command}").stdout
+      # @example DeviceAPI::ADB.pm(qualifier, 'list packages')
+      def self.pm(qualifier, command)
+        shell(qualifier, "pm #{command}").stdout
       end
 
       # Blocks a package, used on Android versions less than KitKat
       # Returns boolean
-      # @param serial serial of device
+      # @param qualifier qualifier of device
       # @param package to block
-      def self.block_package(serial, package)
-        result = pm(serial, "block #{package}")
+      def self.block_package(qualifier, package)
+        result = pm(qualifier, "block #{package}")
         result.include?('true')
       end
 
       # Blocks a package on KitKat and above
       # Returns boolean
-      # @param serial serial of device
+      # @param qualifier qualifier of device
       # @param package to hide
-      def self.hide_package(serial, package)
-        result = pm(serial, "hide #{package}")
+      def self.hide_package(qualifier, package)
+        result = pm(qualifier, "hide #{package}")
         result.include?('true')
       end
 

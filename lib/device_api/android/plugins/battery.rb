@@ -5,8 +5,8 @@ module DeviceAPI
         attr_reader :current_temp, :max_temp, :max_current, :voltage, :level, :health, :status
 
         def initialize(options = {})
-          serial = options[:serial]
-          props = ADB.get_battery_info(serial)
+          qualifier = options[:qualifier]
+          props = ADB.get_battery_info(qualifier)
           @current_temp   = props["temperature"]
           @max_temp       = props["mBatteryMaxTemp"]
           @max_current    = props["mBatteryMaxCurrent"]

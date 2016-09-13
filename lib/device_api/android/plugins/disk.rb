@@ -3,14 +3,14 @@ module DeviceAPI
     module Plugin
       class Disk
 
-        attr_reader :serial
+        attr_reader :qualifier
         def initialize(options = {})
-          @serial = options[:serial]
+          @qualifier = options[:qualifier]
         end
 
         def process_stats(options = {})
           disk_info = {}
-          stats = options[:data] || ADB.dumpsys(@serial, 'diskstats')
+          stats = options[:data] || ADB.dumpsys(@qualifier, 'diskstats')
           stats.each do |stat|
             if /(.*)-.*:\s(.*)\s\/\s([0-9]*[A-Z])\s[a-z]*\s=\s([0-9]*%)/.match(stat)
               disk_info["#{Regexp.last_match[1].downcase}_total"] = Regexp.last_match[3]

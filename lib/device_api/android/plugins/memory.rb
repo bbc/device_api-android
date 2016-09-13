@@ -31,8 +31,8 @@ module DeviceAPI
         attr_accessor :processes, :mem_info
 
         def initialize(options = {})
-          @serial = options[:serial]
-          info = options[:data] || ADB.dumpsys(@serial, 'meminfo')
+          @qualifier = options[:qualifier]
+          info = options[:data] || ADB.dumpsys(@qualifier, 'meminfo')
           process_data(info)
         end
 
@@ -46,7 +46,7 @@ module DeviceAPI
         end
 
         def update
-          meminfo = ADB.dumpsys(@serial, 'meminfo')
+          meminfo = ADB.dumpsys(@qualifier, 'meminfo')
           process_data(meminfo)
         end
 

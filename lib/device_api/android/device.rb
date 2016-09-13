@@ -9,6 +9,7 @@ module DeviceAPI
   module Android
     # Device class used for containing the accessors of the physical device information
     class Device < DeviceAPI::Device
+      attr_reader :qualifier
 
       @@subclasses; @@subclasses = {}
 
@@ -25,18 +26,22 @@ module DeviceAPI
       end
 
       def initialize(options = {})
-        @serial = options[:serial]
+        # For devices connected with USB, qualifier and serial are same
+        @qualifier = @serial = options[:serial] 
         @state = options[:state]
         @remote = options[:remote] ? true : false
-        set_ip_and_port if @remote
+        if is_remote?
+          set_ip_and_port
+          @serial = self.serial_no
+        end
       end
 
       def set_ip_and_port
-        address = @serial.split(":")
+        address = @qualifier.split(":")
         @ip_address = address.first
         @port = address.last
       end     
-
+ 
       def is_remote?
         @remote || false
       end
@@ -54,14 +59,14 @@ module DeviceAPI
       end
       
       def connect
-        ADB.connect(@ip_address, @port)
+        ADB.connect(ip_address, port)
       end
 
       def disconnect
         unless is_remote?
-          raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{serial} when it is not a remote device")
+          raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{qualifier} when it is not a remote device")
         end
-        ADB.disconnect(@ip_address, @port)
+        ADB.disconnect(ip_address, port)
       end
 
       # Return the device range
@@ -72,6 +77,12 @@ module DeviceAPI
 
         return device if device == model
         "#{device}_#{model}"
+      end
+
+      # Return the serial number of device
+      # @return (String) serial number
+      def serial_no
+        get_prop('ro.serialno')
       end
 
       # Return the device type
@@ -112,9 +123,9 @@ module DeviceAPI
 
       def block_package(package)
         if version < "5.0.0"
-          ADB.block_package(serial, package)
+          ADB.block_package(qualifier, package)
         else
-          ADB.hide_package(serial, package)
+          ADB.hide_package(qualifier, package)
         end
       end
 
@@ -174,7 +185,7 @@ module DeviceAPI
       end
 
       def list_installed_packages
-        packages = ADB.pm(serial, 'list packages')
+        packages = ADB.pm(qualifier, 'list packages')
         packages.split("\r\n")
       end
 
@@ -191,13 +202,13 @@ module DeviceAPI
       # Initiate monkey tests
       # @param [Hash] args arguments to pass on to ADB.monkey
       def monkey(args)
-        ADB.monkey(serial, args)
+        ADB.monkey(qualifier, args)
       end
 
       # Capture screenshot on device
       # @param [Hash] args arguments to pass on to ADB.screencap
       def screenshot(args)
-        ADB.screencap(serial, args)
+        ADB.screencap(qualifier, args)
       end
 
       # Get the IMEI number of the device
@@ -226,13 +237,13 @@ module DeviceAPI
 
       # Unlock the device by sending a wakeup command
       def unlock
-        ADB.keyevent(serial, '26') unless screen_on?
+        ADB.keyevent(qualifier, '26') unless screen_on?
       end
 
       # Return the DPI of the attached device
       # @return [String] DPI of attached device
       def dpi
-        get_dpi(serial)
+        get_dpi(qualifier)
       end
 
       # Return the device type based on the DPI
@@ -248,23 +259,23 @@ module DeviceAPI
       # Returns wifi status and access point name
       # @return [Hash] :status and :access_point
       def wifi_status
-        ADB.wifi(serial)
+        ADB.wifi(qualifier)
       end
 
       def battery_info
-        ADB.get_battery_info(serial)
+        ADB.get_battery_info(qualifier)
       end
 
       # @param [String] command to start the intent
       # Return the stdout of executed intent
       # @return [String] stdout
       def intent(command)
-        ADB.am(serial, command)
+        ADB.am(qualifier, command)
       end
 
       #Reboots the device
       def reboot
-        ADB.reboot(serial)
+        ADB.reboot(qualifier)
       end
 
       # Returns disk status
@@ -275,12 +286,12 @@ module DeviceAPI
 
       # Returns the device uptime
       def uptime
-        ADB.get_uptime(serial)
+        ADB.get_uptime(qualifier)
       end
 
       # Returns the Wifi IP address
       def ip_address
-        interface = ADB.get_network_interface(serial, 'wlan0')
+        interface = ADB.get_network_interface(qualifier, 'wlan0')
         if interface.match(/ip (.*) mask/)
           Regexp.last_match[1]
         elsif interface.match(/inet addr:(.*)\s+Bcast/)
@@ -292,7 +303,7 @@ module DeviceAPI
 
       # Returns the Wifi mac address
       def wifi_mac_address
-        interface = ADB.get_network_interface(serial, 'wlan0')
+        interface = ADB.get_network_interface(qualifier, 'wlan0')
         if interface.match(/HWaddr (.*)/)
           Regexp.last_match[1].strip
         else
@@ -305,21 +316,21 @@ module DeviceAPI
       private
 
       def get_network_info
-        ADB.get_network_info(serial)
+        ADB.get_network_info(qualifier)
       end
 
       def get_disk_info
-        @diskstat = DeviceAPI::Android::Plugin::Disk.new(serial: serial) unless @diskstat
+        @diskstat = DeviceAPI::Android::Plugin::Disk.new(qualifier: qualifier) unless @diskstat
         @diskstat.process_stats      
       end
 
       def get_battery_info
-        @battery = DeviceAPI::Android::Plugin::Battery.new(serial: serial) unless @battery
+        @battery = DeviceAPI::Android::Plugin::Battery.new(qualifier: qualifier) unless @battery
         @battery
       end
 
       def get_memory_info
-        @memory = DeviceAPI::Android::Plugin::Memory.new(serial: serial) unless @memory
+        @memory = DeviceAPI::Android::Plugin::Memory.new(qualifier: qualifier) unless @memory
         @memory
       end
 
@@ -332,34 +343,34 @@ module DeviceAPI
 
       def get_prop(key)
         if !@props || !@props[key]
-          @props = ADB.getprop(serial)
+          @props = ADB.getprop(qualifier)
         end
         @props[key]
       end
 
       def get_dumpsys(key)
-        @props = ADB.getdumpsys(serial)
+        @props = ADB.getdumpsys(qualifier)
         @props[key]
       end
 
       def get_powerinfo
-        ADB.getpowerinfo(serial)
+        ADB.getpowerinfo(qualifier)
       end
 
       def get_phoneinfo
-        ADB.getphoneinfo(serial)
+        ADB.getphoneinfo(qualifier)
       end
 
       def install_apk(apk)
-        ADB.install_apk(apk: apk, serial: serial)
+        ADB.install_apk(apk: apk, qualifier: qualifier)
       end
 
       def uninstall_apk(package_name)
-        ADB.uninstall_apk(package_name: package_name, serial: serial)
+        ADB.uninstall_apk(package_name: package_name, qualifier: qualifier)
       end
 
       def get_dpi
-        ADB.get_device_dpi(serial)
+        ADB.get_device_dpi(qualifier)
       end
     end
 
