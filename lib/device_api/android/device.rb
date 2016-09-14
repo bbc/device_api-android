@@ -69,6 +69,12 @@ module DeviceAPI
         ADB.disconnect(ip_address, port)
       end
 
+      # Return whether device is connected or not
+      def is_connected?
+        return true if ADB.devices.any? {|device| device.include? qualifier}
+        return false
+      end
+
       # Return the device range
       # @return (String) device range string
       def range
