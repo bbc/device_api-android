@@ -59,14 +59,14 @@ module DeviceAPI
       end
       
       def connect
-        ADB.connect(ip_address, port)
+        ADB.connect(@ip_address, @port)
       end
 
       def disconnect
         unless is_remote?
           raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{qualifier} when it is not a remote device")
         end
-        ADB.disconnect(ip_address, port)
+        ADB.disconnect(@ip_address, @port)
       end
 
       # Return whether device is connected or not
