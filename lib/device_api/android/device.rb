@@ -71,8 +71,7 @@ module DeviceAPI
 
       # Return whether device is connected or not
       def is_connected?
-        return true if ADB.devices.any? {|device| device.include? qualifier}
-        return false
+        ADB.devices.any? {|device| device.include? qualifier}
       end
 
       # Return the device range
