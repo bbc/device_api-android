@@ -2,6 +2,7 @@
 require 'device_api/device'
 require 'device_api/android/adb'
 require 'device_api/android/aapt'
+require 'android/devices'
 
 # DeviceAPI - an interface to allow for automation of devices
 module DeviceAPI
@@ -51,6 +52,11 @@ module DeviceAPI
           raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{serial} when it is not a remote device")
         end
         ADB.disconnect(serial)
+      end
+
+      def display_name
+        device = Android::Devices.search_by_model(model)
+        device.model unless device.nil?
       end
 
       # Return the device range
