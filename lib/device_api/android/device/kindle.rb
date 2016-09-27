@@ -8,7 +8,8 @@ module DeviceAPI
       def unlock
         ADB.keyevent(qualifier, '26') unless screen_on?
         if orientation == :landscape
-          ADB.swipe(qualifier, { x_from: 500, y_from: 575, x_to: 500, y_to: 250 } )
+          ADB.swipe(qualifier, { x_from: 500, y_from: 750, x_to: 500, y_to: 250 } ) if version.split('.').first.to_i >= 5
+          ADB.swipe(qualifier, { x_from: 900, y_from: 500, x_to: 300, y_to: 500 } ) if version.split('.').first.to_i < 5
         else
           ADB.swipe(qualifier, { x_from: 300, y_from: 900, x_to: 300, y_to: 600 } )
         end
