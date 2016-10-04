@@ -1,5 +1,28 @@
 # Change Log
 
+## [v1.2.10](https://github.com/bbc/device_api-android/tree/v1.2.10) (2016-10-03)
+[Full Changelog](https://github.com/bbc/device_api-android/compare/v1.2.9...v1.2.10)
+
+**Fixed bugs:**
+
+- Disconnect fails when serial is ipaddress:port [\#103](https://github.com/bbc/device_api-android/issues/103)
+
+**Closed issues:**
+
+- Reference to qualifiers and serials [\#106](https://github.com/bbc/device_api-android/issues/106)
+- Add android-tv as a device type [\#91](https://github.com/bbc/device_api-android/issues/91)
+- Need to track "protocol fault \(no status\)" error [\#67](https://github.com/bbc/device_api-android/issues/67)
+
+**Merged pull requests:**
+
+- Added checks for AAPT in methods that use it [\#113](https://github.com/bbc/device_api-android/pull/113) ([jonpwilson](https://github.com/jonpwilson))
+- Added Sony Experia Z5 to 51-rules [\#111](https://github.com/bbc/device_api-android/pull/111) ([jonpwilson](https://github.com/jonpwilson))
+- The lock is in a different position on older versions on Kindle [\#110](https://github.com/bbc/device_api-android/pull/110) ([jonpwilson](https://github.com/jonpwilson))
+- Method to check whether device is connected [\#108](https://github.com/bbc/device_api-android/pull/108) ([Asimk21](https://github.com/Asimk21))
+- Replaced serial references to qualifier [\#107](https://github.com/bbc/device_api-android/pull/107) ([Asimk21](https://github.com/Asimk21))
+- Connect and disconnect remote android device [\#105](https://github.com/bbc/device_api-android/pull/105) ([Asimk21](https://github.com/Asimk21))
+- Added changelog [\#104](https://github.com/bbc/device_api-android/pull/104) ([jonpwilson](https://github.com/jonpwilson))
+
 ## [v1.2.9](https://github.com/bbc/device_api-android/tree/v1.2.9) (2016-08-09)
 [Full Changelog](https://github.com/bbc/device_api-android/compare/v1.2.8...v1.2.9)
 
