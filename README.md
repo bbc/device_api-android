@@ -45,13 +45,15 @@ You can use device.is_remote? to determine if the device is a remote device, e.g
 
     device.is_remote?
 
-DeviceAPI::Android::ADB::DeviceAlreadyConnectedError is raised when DeviceAPI::Android.connect is called on an already connected device.
+### Error messages
 
-DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice is raised when we are attempting to call disconnect on a device that is not a remote device, e.g. it has no hope of being disconnected from.
+Here are some of the errors you may encounter as well as a example of what can cause them:
 
-DeviceAPI::Android::ADBCommandError is raised when we cannot connect to a device, e.g. adb times out.
+`DeviceAPI::Android::ADB::DeviceAlreadyConnectedError` - raised when DeviceAPI::Android.connect is called on an currently connected device.
 
-DeviceAPI::Android::ADBCommandError is raised when we cannot disconnect from a device, e.g. adb times out or we were already disconnected.
+`DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice` - raised when we are attempting to call disconnect on a non-remote device.
+
+`DeviceAPI::Android::ADBCommandError` - raised when we cannot connect to a device, e.g. adb times out.
 
 ### Detecting devices
 
