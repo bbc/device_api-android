@@ -7,12 +7,16 @@ module DeviceAPI
       # work due to Amazons implementation of the Keyguard.
       def unlock
         ADB.keyevent(qualifier, '26') unless screen_on?
+
+        return ADB.swipe(qualifier, {x_from: 900, y_from: 500, x_to: 300, y_to: 500}) if version.split('.').first.to_i < 5
+
         if orientation == :landscape
-          ADB.swipe(qualifier, { x_from: 500, y_from: 750, x_to: 500, y_to: 250 } ) if version.split('.').first.to_i >= 5
-          ADB.swipe(qualifier, { x_from: 900, y_from: 500, x_to: 300, y_to: 500 } ) if version.split('.').first.to_i < 5
+          coords = { x_from: 500, y_from: 750, x_to: 500, y_to: 250 }
         else
-          ADB.swipe(qualifier, { x_from: 300, y_from: 900, x_to: 300, y_to: 600 } )
+          coords = { x_from: 300, y_from: 900, x_to: 300, y_to: 600 }
         end
+
+        ADB.swipe(qualifier, coords)
       end
     end
   end
