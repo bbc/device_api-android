@@ -11,7 +11,7 @@ module DeviceAPI
     class Device < DeviceAPI::Device
       attr_reader :qualifier
 
-      @@subclasses; @@subclasses = {}
+      @@subclasses = {}
 
       # Called by any inheritors to register themselves with the parent class
       def self.inherited(klass)
