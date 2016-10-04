@@ -17,10 +17,10 @@ describe DeviceAPI::Android::Plugin::Audio do
 
     it 'should handle arbitrary volumes' do
       volumes = {
-          '20': 100,
-          '15': 75,
-          '10': 50,
-          '5': 25
+          '20' => 100,
+          '15' => 75,
+          '10' => 50,
+          '5'  => 25
       }
 
       random = rand(volumes.count)
