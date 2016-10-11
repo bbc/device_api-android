@@ -66,5 +66,7 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="1004", ATTR{idProduct}=="631f", MODE="0666", 
 SUBSYSTEM=="usb", ATTR{idVendor}=="1d4d", ATTR{idProduct}=="504b", MODE="0666", OWNER="hive"
 # HTC Desire S
 SUBSYSTEM=="usb", ATTR{idVendor}=="0bb4", ATTR{idProduct}=="0cab", MODE="0666", OWNER="hive"
+# HTC One M8
+SUBSYSTEM=="usb", ATTR{idVendor}=="0bb4", ATTR{idProduct}=="0c81", MODE="0666", OWNER="hive"
 # Sony Experia Z5
 SUBSYSTEM=="usb", ATTR{idVendor}=="0fce", ATTR{idProduct}=="51d9", MODE="0666", OWNER="hive"
