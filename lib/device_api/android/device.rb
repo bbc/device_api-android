@@ -32,7 +32,7 @@ module DeviceAPI
         @remote = options[:remote] ? true : false
         if is_remote?
           set_ip_and_port
-          @serial = self.serial_no
+          @serial = self.serial_no if !["unknown", "offline"].include? @state
         end
       end
 
@@ -54,7 +54,8 @@ module DeviceAPI
             'no device' => :dead,
             'offline' => :offline,
             'unauthorized' => :unauthorized,
-            'no permissions' => :no_permissions
+            'no permissions' => :no_permissions,
+            'unknown' => :unknown
         }[@state]
       end
       
