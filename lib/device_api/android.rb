@@ -55,7 +55,7 @@ module DeviceAPI
 
     # Return the device type used in determining which Device Object to create
     def self.get_device_type(options)
-      return :default if options.values.first == 'unauthorized'
+      return :default if ['unauthorized', 'offline', 'unknown'].include? options.values.first
       serial = options.keys.first
       state = ADB.get_state(serial)
       begin
