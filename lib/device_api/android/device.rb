@@ -281,7 +281,7 @@ module DeviceAPI
 
       #Reboots the device
       def reboot
-        ADB.reboot(qualifier)
+        ADB.reboot(qualifier, is_remote?)
       end
 
       # Returns disk status

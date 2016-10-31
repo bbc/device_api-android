@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'device_api-android'
-  s.version     = '1.2.12'
+  s.version     = '1.2.13'
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = 'Android Device Management API'
   s.description = 'Android implementation of DeviceAPI'
