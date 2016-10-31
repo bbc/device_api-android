@@ -187,11 +187,13 @@ module DeviceAPI
       end
 
       # Reboots the specified device
+      # Remote devices are rebooted and disconnected from system
       # @param qualifier qualifier of device
       # @return (nil) Nil if successful, otherwise an error is raised
       def self.reboot(qualifier, remote)
         if remote
-          result = execute("adb -s #{qualifier} reboot")
+          result = system("adb -s #{qualifier} reboot &")
+          self.disconnect(qualifier.split(":").first)
         else
           result = execute("adb -s #{qualifier} reboot && adb -s #{qualifier} wait-for-device shell 'while [[ $(getprop dev.bootcomplete | tr -d '\r') != 1 ]    ]; do sleep 1; printf .; done'")
         end
