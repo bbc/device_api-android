@@ -189,8 +189,12 @@ module DeviceAPI
       # Reboots the specified device
       # @param qualifier qualifier of device
       # @return (nil) Nil if successful, otherwise an error is raised
-      def self.reboot(qualifier)
-        result = execute("adb -s #{qualifier} reboot")
+      def self.reboot(qualifier, remote)
+        if remote
+          result = execute("adb -s #{qualifier} reboot")
+        else
+          result = execute("adb -s #{qualifier} reboot && adb -s #{qualifier} wait-for-device shell 'while [[ $(getprop dev.bootcomplete | tr -d '\r') != 1 ]    ]; do sleep 1; printf .; done'")
+        end
         raise ADBCommandError.new(result.stderr) if result.exit != 0
       end
 
