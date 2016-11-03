@@ -31,7 +31,8 @@ module DeviceAPI
       if serial.to_s.empty?
         raise DeviceAPI::BadSerialString.new("serial was '#{serial.nil? ? 'nil' : serial}'")
       end
-      state = ADB.get_state(serial)
+      device = ADB.devices.select {|k| k.keys.first == serial}
+      state = device.first[serial] || 'unknown'
       remote = check_if_remote_device?(serial)
       DeviceAPI::Android::Device.create( self.get_device_type({ :"#{serial}" => state}),  { serial: serial, state: state, remote: remote })
     end
@@ -57,13 +58,13 @@ module DeviceAPI
     def self.get_device_type(options)
       return :default if ['unauthorized', 'offline', 'unknown'].include? options.values.first
       serial = options.keys.first
-      state = ADB.get_state(serial)
+      state = options.values.first
       begin
         man = Device.new(serial: serial, state: state).manufacturer
       rescue DeviceAPI::DeviceNotFound
         return :default
       rescue => e
-        puts "Unrecognised exception whilst finding device '#{serial}' (state: #{options.values.first})"
+        puts "Unrecognised exception whilst finding device '#{serial}' (state: #{state})"
         puts e.message
         puts e.backtrace.inspect
         return :default
