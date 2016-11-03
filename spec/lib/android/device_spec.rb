@@ -50,7 +50,8 @@ eof
 
     it "Returns an object representing a device" do
       out = <<_______________________________________________________
-    device
+List of devices attached
+SH34RW905290	device
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
 
@@ -62,7 +63,8 @@ _______________________________________________________
 
     it "Throws a descriptive error when asked to disconnect a normal device" do
       out = <<_______________________________________________________
-    device
+List of devices attached
+SH34RW905291	device
 _______________________________________________________
       allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
       device = DeviceAPI::Android.device('SH34RW905291')
