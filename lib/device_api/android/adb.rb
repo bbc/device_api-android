@@ -25,7 +25,7 @@ module DeviceAPI
       # @param qualifier qualifier of device
       # @return (String) device state
       def self.get_state(qualifier)
-        result = execute('adb get-state -s #{qualifier}')
+        result = execute('adb -s #{qualifier} get-state')
 
         raise ADBCommandError.new(result.stderr) if result.exit != 0
 
