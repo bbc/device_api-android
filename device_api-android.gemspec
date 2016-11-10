@@ -11,4 +11,5 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.add_runtime_dependency 'device_api', '~> 1.0.2'
   s.add_development_dependency 'rspec', '~> 3'
+  s.add_development_dependency 'simplecov', '~> 0.12'
 end
