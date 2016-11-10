@@ -1,4 +1,5 @@
 # DeviceAPI-Android
+[![Build Status](https://travis-ci.org/bbc/device_api-android.svg?branch=master)](https://travis-ci.org/bbc/device_api-android)
 
 *DeviceAPI-Android* is the android implementation of device_api -- an initiative to allow full automation of device activities. For a full list of release notes, see the [change log](CHANGELOG.md)
 
