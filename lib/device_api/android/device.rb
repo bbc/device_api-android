@@ -124,13 +124,13 @@ module DeviceAPI
       # Return the battery level
       # @return (String) device battery level
       def battery_level
-        get_battery_info['level']
+        get_battery_info.level
       end
 
       # Is the device currently being powered?
       # @return (Boolean) true if it is being powered in some way, false if it is unpowered
       def powered?
-        !get_battery_info.select { |keys| keys.include?('powered')}.select { |_,v| v == 'true' }.empty?
+        get_battery_info.powered
       end
 
       def block_package(package)
