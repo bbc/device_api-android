@@ -236,11 +236,14 @@ module DeviceAPI
       def self.screencap( qualifier, args )
         
         filename = args[:filename] or raise "filename not provided (:filename => '/tmp/myfile.png')"
- 
-        convert_carriage_returns = %q{perl -pe 's/\x0D\x0A/\x0A/g'}
-        cmd = "screencap -p | #{convert_carriage_returns} > #{filename}"
         
-        cmd = "screencap -p" if getprop(qualifier)['ro.build.version.release'].to_i > 6
+        if getprop(qualifier)['ro.build.version.release'].to_i < 7
+          convert_carriage_returns = %q{perl -pe 's/\x0D\x0A/\x0A/g'} 
+          cmd = "screencap -p | #{convert_carriage_returns} > #{filename}"
+        else
+          cmd = "screencap -p > #{filename}"
+        end
+
         shell(qualifier, cmd)
       end
       
