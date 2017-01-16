@@ -325,6 +325,11 @@ module DeviceAPI
         end
       end
 
+      def resolution
+       res = ADB.dumpsys(qualifier, 'window | grep mUnrestrictedScreen')
+       /^.* (.*)x(.*)$/.match(res.first)
+      end
+
       private
 
       def get_network_info
