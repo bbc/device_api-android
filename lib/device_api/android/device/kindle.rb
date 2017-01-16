@@ -15,7 +15,11 @@ module DeviceAPI
         res = resolution
         x = res[1].to_i
         y = res[2].to_i
-        { x_from: x/2, y_from: y -100, x_to: x/2, y_to: y/6}
+        if version.split('.').first.to_i < 5
+          {x_from: x - 100, y_from: y/2, x_to: x/6, y_to: y/2}
+        else
+          { x_from: x/2, y_from: y -100, x_to: x/2, y_to: y/6}
+        end
       end
 
     end
