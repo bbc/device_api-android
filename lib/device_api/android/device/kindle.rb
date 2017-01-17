@@ -7,7 +7,6 @@ module DeviceAPI
       # work due to Amazons implementation of the Keyguard.
       def unlock
         ADB.keyevent(qualifier, '26') unless screen_on?
-        return ADB.swipe(qualifier, {x_from: 900, y_from: 500, x_to: 300, y_to: 500}) if version.split('.').first.to_i < 5
         ADB.swipe(qualifier, swipe_coords)
       end
 
