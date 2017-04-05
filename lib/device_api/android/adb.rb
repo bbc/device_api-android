@@ -308,6 +308,8 @@ module DeviceAPI
           raise DeviceAPI::UnauthorizedDevice, result.stderr
         when /^error: device not found/
           raise DeviceAPI::DeviceNotFound, result.stderr
+        when /^\/system\/bin\/sh: netcfg: not found/
+          return result
         else
           raise ADBCommandError.new(result.stderr)
         end if result.exit != 0
