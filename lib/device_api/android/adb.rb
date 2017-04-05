@@ -308,6 +308,10 @@ module DeviceAPI
           raise DeviceAPI::UnauthorizedDevice, result.stderr
         when /^error: device not found/
           raise DeviceAPI::DeviceNotFound, result.stderr
+        # ADB.get_network_info on android > 7 behave differently
+        #   On linux exit code is 127
+        #   On MAC exit code is 0
+        # Caught here to give get_network_info consistent response
         when /^\/system\/bin\/sh: netcfg: not found/
           return result
         else
