@@ -19,22 +19,22 @@ module DeviceAPI
     def self.devices
       ADB.devices.map do |d|
         if d.keys.first && !d.keys.first.include?('?')
-          serial = d.keys.first
-          remote = check_if_remote_device?(serial)
-          DeviceAPI::Android::Device.create( self.get_device_type(d), { serial: serial, state: d.values.first, remote: remote} )
+          qualifier = d.keys.first
+          remote = check_if_remote_device?(qualifier)
+          DeviceAPI::Android::Device.create( self.get_device_type(d), { qualifier: qualifier, state: d.values.first, remote: remote} )
         end
       end.compact
     end
 
     # Retrieve an Device object by serial id
-    def self.device(serial)
-      if serial.to_s.empty?
-        raise DeviceAPI::BadSerialString.new("serial was '#{serial.nil? ? 'nil' : serial}'")
+    def self.device(qualifier)
+      if qualifier.to_s.empty?
+        raise DeviceAPI::BadSerialString.new("Qualifier was '#{qualifier.nil? ? 'nil' : qualifier}'")
       end
-      device = ADB.devices.select {|k| k.keys.first == serial}
-      state = device.first[serial] || 'unknown'
-      remote = check_if_remote_device?(serial)
-      DeviceAPI::Android::Device.create( self.get_device_type({ :"#{serial}" => state}),  { serial: serial, state: state, remote: remote })
+      device = ADB.devices.select {|k| k.keys.first == qualifier}
+      state = device.first[qualifier] || 'unknown'
+      remote = check_if_remote_device?(qualifier)
+      DeviceAPI::Android::Device.create( self.get_device_type({ :"#{qualifier}" => state}),  { qualifier:  qualifier, state: state, remote: remote })
     end
 
     def self.connect(ipaddress,port=5555)
@@ -45,9 +45,9 @@ module DeviceAPI
       ADB.disconnect(ipaddress,port)
     end
 
-    def self.check_if_remote_device?(serial)
+    def self.check_if_remote_device?(qualifier)
       begin
-        ADB::check_ip_address(serial)
+        ADB::check_ip_address(qualifier)
         true
       rescue ADBCommandError
         false 
@@ -57,14 +57,14 @@ module DeviceAPI
     # Return the device type used in determining which Device Object to create
     def self.get_device_type(options)
       return :default if ['unauthorized', 'offline', 'unknown'].include? options.values.first
-      serial = options.keys.first
+      qualifier = options.keys.first
       state = options.values.first
       begin
-        man = Device.new(serial: serial, state: state).manufacturer
+        man = Device.new(qualifier: qualifier, state: state).manufacturer
       rescue DeviceAPI::DeviceNotFound
         return :default
       rescue => e
-        puts "Unrecognised exception whilst finding device '#{serial}' (state: #{state})"
+        puts "Unrecognised exception whilst finding device '#{qualifier}' (state: #{state})"
         puts e.message
         puts e.backtrace.inspect
         return :default

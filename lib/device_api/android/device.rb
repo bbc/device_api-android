@@ -28,8 +28,9 @@ module DeviceAPI
 
       def initialize(options = {})
         # For devices connected with USB, qualifier and serial are same
-        @qualifier = @serial = options[:serial] 
+        @qualifier = options[:qualifier] 
         @state = options[:state]
+        @serial = options[:serial] || @qualifier
         @remote = options[:remote] ? true : false
         if is_remote?
           set_ip_and_port
