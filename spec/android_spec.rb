@@ -204,9 +204,17 @@ _______________________________________________________
 
         it 'can return the Wifi mac address' do
           out = <<EOF
-lo       UP                                   127.0.0.1/8   0x00000049 00:00:00:00:00:00
-rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4c:c4:25:5b
-wlan0    UP                                     0.0.0.0/0   0x00001003 fc:c2:de:6a:04:9e
+4: ip6tnl0: <NOARP> mtu 1452 qdisc noop state DOWN 
+    link/tunnel6 :: brd ::
+5: p2p0: <NO-CARRIER,BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DORMANT qlen 1000
+    link/ether 42:b4:cd:73:8f:8b brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::40b4:cdff:fe73:8f8b/64 scope link 
+       valid_lft forever preferred_lft forever
+6: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether fc:c2:de:6a:04:9e brd ff:ff:ff:ff:ff:ff
+    inet 192.168.101.227/24 brd 192.168.101.255 scope global wlan0
+    inet6 fe80::42b4:cdff:fe73:8f8b/64 scope link 
+       valid_lft forever preferred_lft forever
 EOF
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
@@ -215,14 +223,15 @@ EOF
 
         it 'can return the Wifi mac address on an Android 6.0 and above device' do
           out = <<-EOF
-wlan0     Link encap:Ethernet  HWaddr 00:9A:CD:5E:CC:40
-          inet addr:10.10.1.108  Bcast:10.10.255.255  Mask:255.255.0.0
-          inet6 addr: ff80::29a:cbdf:ff5f:cc40/64 Scope: Link
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:3132210 errors:0 dropped:2310977 overruns:0 frame:0
-          TX packets:87349 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000
-          RX bytes:537224812 TX bytes:9711181
+5: p2p0: <NO-CARRIER,BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DORMANT qlen 1000
+    link/ether 42:b4:cd:73:8f:8b brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::40b4:cdff:fe73:8f8b/64 scope link 
+       valid_lft forever preferred_lft forever
+6: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 00:9A:CD:5E:CC:40 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.101.227/24 brd 192.168.101.255 scope global wlan0
+    inet6 fe80::42b4:cdff:fe73:8f8b/64 scope link 
+       valid_lft forever preferred_lft forever
           EOF
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
@@ -235,6 +244,7 @@ wlan0     Link encap:Ethernet  HWaddr 00:9A:CD:5E:CC:40
 lo       UP                                   127.0.0.1/8   0x00000049 00:00:00:00:00:00
 rmnet_usb0 DOWN                                   0.0.0.0/0   0x00001002 9a:ca:4c:c4:25:5b
 EOF
+
 
           device = DeviceAPI::Android::Device.new(serial: 'SH34RW905290')
           allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }
