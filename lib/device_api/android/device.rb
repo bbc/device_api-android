@@ -317,14 +317,6 @@ module DeviceAPI
       # Returns the Wifi mac address
       def wifi_mac_address
         return ADB.get_wifi_mac_address(qualifier)
-      #  interface = ADB.get_network_interface(qualifier, 'wlan0')
-      #  if interface.match(/HWaddr (.*)/)
-      #    Regexp.last_match[1].strip
-      #  else
-      #    network = get_network_info
-      #    wifi = network.detect { |a| a[:name] == 'wlan0' }
-      #    wifi[:mac] unless wifi.nil?
-      #  end
       end
 
       def resolution
