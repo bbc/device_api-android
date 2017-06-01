@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    device_api-android (1.2.19)
+    device_api-android (1.2.20)
       android-devices
       device_api (~> 1.0.2)
 
