@@ -83,6 +83,13 @@ module DeviceAPI
         end
       end
 
+      def self.get_wifi_mac_address(qualifier)
+        lines = shell(qualifier, 'ip address')
+        lines = lines.to_s.gsub(/\r\n/, '') if lines
+        match_data = lines.match(/wlan0: .+? (\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})/)
+        match_data[1] if match_data
+      end
+
       # Processes the results from dumpsys to format them into a hash
       # @param [String] regex_string regex string used to separate the results from the keys
       # @param [Array] data data returned from dumpsys
