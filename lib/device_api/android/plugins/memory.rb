@@ -5,14 +5,13 @@ module DeviceAPI
       # Class used to provide information about process memory usage
       # and device memory usage
       class Memory
-
         # Class used for holding process information
         class MemInfo
           attr_reader :process, :memory, :pid
           def initialize(options = {})
             @process = options[:process]
-            @memory = options[:memory]
-            @pid = options[:pid]
+            @memory  = options[:memory]
+            @pid     = options[:pid]
           end
         end
 
@@ -37,7 +36,7 @@ module DeviceAPI
         end
 
         def process_data(memory_info)
-          groups = memory_info.chunk { |a| a == '' }.reject { |a,_| a  }.map { |_,b| b }
+          groups = memory_info.chunk { |a| a == '' }.reject { |a, _| a }.map { |_, b| b }
 
           raise 'A different ADB result has been received' unless groups[1].first == 'Total PSS by process:'
           @processes = []
@@ -54,7 +53,7 @@ module DeviceAPI
         def process_total_pss_by_process(data)
           data.each do |l|
             if /(.*):\s+(.*)\s+\(.*pid\s+(\S*).*\)/.match(l)
-              @processes << MemInfo.new(process: Regexp.last_match[2], memory: Regexp.last_match[1], pid: Regexp.last_match[3] )
+              @processes << MemInfo.new(process: Regexp.last_match[2], memory: Regexp.last_match[1], pid: Regexp.last_match[3])
             end
           end
         end

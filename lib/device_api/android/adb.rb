@@ -1,4 +1,5 @@
 # Encoding: utf-8
+
 # TODO: create new class for aapt that will get the package name from an apk using: JitG
 # aapt dump badging packages/bbciplayer-debug.apk
 require 'open3'
@@ -17,17 +18,17 @@ module DeviceAPI
       def self.devices
         result = execute_with_timeout_and_retry('adb devices')
 
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
-        result.stdout.scan(/(.*)\t(.*)/).map { |a,b| {a => b}}
+        raise ADBCommandError, result.stderr if result.exit != 0
+        result.stdout.scan(/(.*)\t(.*)/).map { |a, b| { a.strip => b.strip } }
       end
 
       # Retrieve device state for a single device
       # @param qualifier qualifier of device
       # @return (String) device state
       def self.get_state(qualifier)
-        result = execute('adb -s #{qualifier} get-state')
+        result = execute("adb -s #{qualifier} get-state")
 
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        raise ADBCommandError, result.stderr if result.exit != 0
 
         lines = result.stdout.split("\n")
         /(.*)/.match(lines.last)
@@ -78,7 +79,7 @@ module DeviceAPI
       def self.get_network_info(qualifier)
         lines = shell(qualifier, 'netcfg')
         lines.stdout.split("\n").map do |a|
-          b = a.split(" ")
+          b = a.split(' ')
           { name: b[0], ip: b[2].split('/')[0], mac: b[4] }
         end
       end
@@ -118,9 +119,7 @@ module DeviceAPI
         lines = dumpsys(qualifier, 'window')
         dpi = nil
         lines.each do |line|
-          if /sw(\d*)dp/.match(line)
-            dpi = Regexp.last_match[1]
-          end
+          dpi = Regexp.last_match[1] if /sw(\d*)dp/.match(line)
         end
         dpi
       end
@@ -130,7 +129,7 @@ module DeviceAPI
       # @return (Array) array of results from adb shell dumpsys
       def self.dumpsys(qualifier, command)
         result = shell(qualifier, "dumpsys #{command}")
-        result.stdout.split("\n").map { |line| line.strip }
+        result.stdout.split("\n").map(&:strip)
       end
 
       # Installs a specified apk to a specific device
@@ -160,19 +159,19 @@ module DeviceAPI
         action = options[:action]
 
         case action
-          when :install
-            command = "adb -s #{qualifier} install #{apk}"
-          when :uninstall
-            command = "adb -s #{qualifier} uninstall #{package_name}"
-          else
-            raise ADBCommandError.new('No action specified')
+        when :install
+          command = "adb -s #{qualifier} install #{apk}"
+        when :uninstall
+          command = "adb -s #{qualifier} uninstall #{package_name}"
+        else
+          raise ADBCommandError, 'No action specified'
         end
 
         result = execute(command)
 
-        raise ADBCommandError.new(result.stderr) if result.exit != 0
+        raise ADBCommandError, result.stderr if result.exit != 0
 
-        lines = result.stdout.split("\n").map { |line| line.strip }
+        lines = result.stdout.split("\n").map(&:strip)
 
         lines.last
       end
@@ -201,13 +200,13 @@ module DeviceAPI
         if remote
           begin
             system("adb -s #{qualifier} reboot &")
-            self.disconnect(qualifier.split(":").first)
+            disconnect(qualifier.split(':').first)
           rescue => e
-            raise ADBCommandError.new(e)
+            raise ADBCommandError, e
           end
         else
           result = execute("adb -s #{qualifier} reboot && adb -s #{qualifier} wait-for-device shell 'while [[ $(getprop dev.bootcomplete | tr -d '\r') != 1 ]    ]; do sleep 1; printf .; done'")
-          raise ADBCommandError.new(result.stderr) if result.exit != 0
+          raise ADBCommandError, result.stderr if result.exit != 0
         end
       end
 
@@ -221,31 +220,29 @@ module DeviceAPI
       # @example
       #   DeviceAPI::ADB.monkey( qualifier, :package => 'my.lovely.app' )
       def self.monkey(qualifier, args)
-
-        events = args[:events] || 10000
-        package = args[:package] or raise "package name not provided (:package => 'bbc.iplayer')"
+        events = args[:events] || 10_000
+        (package = args[:package]) || raise("package name not provided (:package => 'bbc.iplayer')")
         seed = args[:seed]
         throttle = args[:throttle]
 
         cmd = "monkey -p #{package} -v #{events}"
-        cmd = cmd + " -s #{seed}" if seed
-        cmd = cmd + " -t #{throttle}" if throttle
+        cmd += " -s #{seed}" if seed
+        cmd += " -t #{throttle}" if throttle
 
         shell(qualifier, cmd)
       end
-      
+
       # Take a screenshot from the device
       # @param qualifier qualifier of device
       # @param [Hash] args hash of arguments
       # @option args [String] :filename name (with full path) required to save the image
       # @example
       #   DeviceAPI::ADB.screenshot( qualifier, :filename => '/tmp/filename.png' )
-      def self.screencap( qualifier, args )
-        
-        filename = args[:filename] or raise "filename not provided (:filename => '/tmp/myfile.png')"
-        
+      def self.screencap(qualifier, args)
+        (filename = args[:filename]) || raise("filename not provided (:filename => '/tmp/myfile.png')")
+
         if getprop(qualifier)['ro.build.version.release'].to_i < 7
-          convert_carriage_returns = %q{perl -pe 's/\x0D\x0A/\x0A/g'} 
+          convert_carriage_returns = %q(perl -pe 's/\x0D\x0A/\x0A/g')
           cmd = "screencap -p | #{convert_carriage_returns} > #{filename}"
         else
           cmd = "screencap -p > #{filename}"
@@ -253,38 +250,38 @@ module DeviceAPI
 
         shell(qualifier, cmd)
       end
-      
+
       # Connects to remote android device
-      # @param [String] ip_address 
+      # @param [String] ip_address
       # @param [String] port
       # @example
-      #  DeviceAPI::ADB.connect(ip_address, port)  
-      def self.connect(ip_address, port=5555)
+      #  DeviceAPI::ADB.connect(ip_address, port)
+      def self.connect(ip_address, port = 5555)
         ip_address_and_port = "#{ip_address}:#{port}"
         check_ip_address(ip_address_and_port)
         cmd = "adb connect #{ip_address_and_port}"
         result = execute(cmd)
         if result.stdout.to_s =~ /.*already connected to.*/
-          raise DeviceAlreadyConnectedError.new("Device #{ip_address_and_port} already connected")
-        else 
+          raise DeviceAlreadyConnectedError, "Device #{ip_address_and_port} already connected"
+        else
           unless result.stdout.to_s =~ /.*connected to.*/
-            raise ADBCommandError.new("Unable to adb connect to #{ip_address_and_port} result was: #{result.stdout}")
+            raise ADBCommandError, "Unable to adb connect to #{ip_address_and_port} result was: #{result.stdout}"
           end
-        end 
+        end
       end
-    
+
       # Disconnects from remote android device
       # @param [String] ip_address
       # @param [String] port
       # @example
-      #  DeviceAPI::ADB.disconnect(ip_address, port) 
-      def self.disconnect(ip_address, port=5555)
+      #  DeviceAPI::ADB.disconnect(ip_address, port)
+      def self.disconnect(ip_address, port = 5555)
         ip_address_and_port = "#{ip_address}:#{port}"
         check_ip_address(ip_address_and_port)
         cmd = "adb disconnect #{ip_address_and_port}"
         result = execute(cmd)
         unless result.exit == 0
-          raise ADBCommandError.new("Unable to adb disconnect to #{ip_address_and_port} result was: #{result.stdout}")
+          raise ADBCommandError, "Unable to adb disconnect to #{ip_address_and_port} result was: #{result.stdout}"
         end
       end
 
@@ -295,7 +292,7 @@ module DeviceAPI
       def self.wifi(qualifier)
         result = shell(qualifier, 'dumpsys wifi | grep mNetworkInfo')
 
-        {:status => result.stdout.match("state:(.*?),")[1].strip, :access_point => result.stdout.match("extra:(.*?),")[1].strip.gsub(/"/,'')}
+        { status: result.stdout.match('state:(.*?),')[1].strip, access_point: result.stdout.match('extra:(.*?),')[1].strip.delete('"') }
       end
 
       # Sends a key event to the specified device
@@ -310,20 +307,22 @@ module DeviceAPI
       # @param [String] command command to execute
       def self.shell(qualifier, command)
         result = execute("adb -s '#{qualifier}' shell #{command}")
-        case result.stderr
-        when /^error: device unauthorized./
-          raise DeviceAPI::UnauthorizedDevice, result.stderr
-        when /^error: device not found/
-          raise DeviceAPI::DeviceNotFound, result.stderr
-        # ADB.get_network_info on android > 7 behave differently
-        #   On linux exit code is 127
-        #   On MAC exit code is 0
-        # Caught here to give get_network_info consistent response
-        when /^\/system\/bin\/sh: netcfg: not found/
-          return result
-        else
-          raise ADBCommandError.new(result.stderr)
-        end if result.exit != 0
+        if result.exit != 0
+          case result.stderr
+          when /^error: device unauthorized./
+            raise DeviceAPI::UnauthorizedDevice, result.stderr
+          when /^error: device not found/
+            raise DeviceAPI::DeviceNotFound, result.stderr
+          # ADB.get_network_info on android > 7 behave differently
+          #   On linux exit code is 127
+          #   On MAC exit code is 0
+          # Caught here to give get_network_info consistent response
+          when /^\/system\/bin\/sh: netcfg: not found/
+            return result
+          else
+            raise ADBCommandError, result.stderr
+          end
+        end
 
         result
       end
@@ -335,14 +334,14 @@ module DeviceAPI
       # @option coords [String] :x_to (0) Coordinate to end on on the X axis
       # @option coords [String] :y_from (0) Coordinate to start from on the Y axis
       # @option coords [String] :y_to (0) Coordinate to end on on the Y axis
-      def self.swipe(qualifier, coords = {x_from: 0, y_from: 0, x_to: 0, y_to: 0 })
+      def self.swipe(qualifier, coords = { x_from: 0, y_from: 0, x_to: 0, y_to: 0 })
         shell(qualifier, "input swipe #{coords[:x_from]} #{coords[:y_from]} #{coords[:x_to]} #{coords[:y_to]}").stdout
       end
 
-      # Starts intent using adb 
+      # Starts intent using adb
       # Returns stdout
-      # @param qualifier qualifier of device 
-      # @param command -option activity 
+      # @param qualifier qualifier of device
+      # @param command -option activity
       # @example
       # DeviceAPI::ADB.am(qualifier, "start -a android.intent.action.MAIN -n com.android.settings/.wifi.WifiSettings")
       def self.am(qualifier, command)
@@ -376,8 +375,8 @@ module DeviceAPI
       end
 
       def self.check_ip_address(ip_address_and_port)
-        unless ip_address_and_port =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/ 
-             raise ADBCommandError.new("Invalid IP address and port #{ip_address_and_port}")
+        unless ip_address_and_port =~ /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):[0-9]+\Z/
+          raise ADBCommandError, "Invalid IP address and port #{ip_address_and_port}"
         end
       end
     end
@@ -393,6 +392,5 @@ module DeviceAPI
         super(msg)
       end
     end
-
   end
 end

@@ -17,10 +17,10 @@ describe DeviceAPI::Android::Plugin::Audio do
 
     it 'should handle arbitrary volumes' do
       volumes = {
-          '20' => 100,
-          '15' => 75,
-          '10' => 50,
-          '5'  => 25
+        '20' => 100,
+        '15' => 75,
+        '10' => 50,
+        '5'  => 25
       }
 
       random = rand(volumes.count)
@@ -28,7 +28,7 @@ describe DeviceAPI::Android::Plugin::Audio do
         volume steps: 20
         - STREAM_SYSTEM:
           Mute count: 0
-          Current: 2: #{volumes.keys[random].to_s}, 400000000: 7,
+          Current: 2: #{volumes.keys[random]}, 400000000: 7,
       EOF
 
       allow(Open3).to receive(:capture3) { [out, '', STATUS_ZERO] }

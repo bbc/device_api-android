@@ -2,15 +2,14 @@ module DeviceAPI
   module Android
     module Plugin
       class Audio
-
         attr_reader :qualifier
 
         def initialize(options)
-          @qualifier = options #[:serial]
+          @qualifier = options # [:serial]
         end
 
         def get_volume_steps
-          audio = ADB.dumpsys( @qualifier, 'audio' )
+          audio = ADB.dumpsys(@qualifier, 'audio')
           vol_steps = audio.detect { |a| a.include?('volume steps:') }
           return nil if vol_steps.nil?
 
@@ -21,7 +20,6 @@ module DeviceAPI
           system = get_system_volume
           volume = system.select { |a| a.include?('Current') }.first
           volume.scan(/Current: 2:\s(.*?),(:?.*)/).flatten.first.to_i
-
         end
 
         def is_muted?
@@ -58,17 +56,17 @@ module DeviceAPI
 
         def change_volume(op, key)
           op.times do
-            ADB.keyevent(@qualifier, key )
+            ADB.keyevent(@qualifier, key)
           end
         end
 
         def get_system_volume
-          audio = ADB.dumpsys( @qualifier, 'audio' )
+          audio = ADB.dumpsys(@qualifier, 'audio')
           index = audio.index('- STREAM_SYSTEM:')
 
           return nil if index.nil?
 
-          audio[index+1..index+2]
+          audio[index + 1..index + 2]
         end
       end
     end

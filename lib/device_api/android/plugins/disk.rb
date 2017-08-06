@@ -2,7 +2,6 @@ module DeviceAPI
   module Android
     module Plugin
       class Disk
-
         attr_reader :qualifier
         def initialize(options = {})
           @qualifier = options[:qualifier]
@@ -19,10 +18,9 @@ module DeviceAPI
             elsif /(.*):\s(\S*)/.match(stat)
               disk_info[Regexp.last_match[1].downcase] = Regexp.last_match[2]
             end
-          end 
+          end
           disk_info
         end
-
       end
     end
   end
