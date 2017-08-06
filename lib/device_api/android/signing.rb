@@ -4,7 +4,6 @@ module DeviceAPI
   module Android
     # Namespace for all methods encapsulating adb calls
     class Signing < Execution
-
       # Creates a keystore used for signing apks
       # @param [Hash] options options to pass through to keytool
       # @option options [String] :keystore ('~/.android/debug.keystore') full path to location to create keystore
@@ -19,7 +18,7 @@ module DeviceAPI
         password    = options[:password]  || 'android'
 
         result = execute("keytool -genkey -noprompt -alias #{alias_name} -dname '#{dname}' -keystore #{keystore} -storepass #{password} -keypass #{password} -keyalg RSA -keysize 2048 -validity 10000")
-        raise SigningCommandError.new(result.stderr) if result.exit != 0
+        raise SigningCommandError, result.stderr if result.exit != 0
         true
       end
 
@@ -44,9 +43,14 @@ module DeviceAPI
           return false unless resign
           unsign_apk(apk)
         end
-        generate_keystore({ keystore: keystore, password: keystore_password, alias_name: alias_name }) unless File.exists?(File.expand_path(keystore))
+        unless File.exist?(File.expand_path(keystore))
+          generate_keystore(keystore: keystore,
+                            password: keystore_password,
+                            alias_name: alias_name)
+        end
+
         result = execute("jarsigner -verbose -sigalg MD5withRSA -digestalg SHA1 -keystore #{File.expand_path(keystore)} -storepass #{keystore_password} #{apk} #{alias_name}")
-        raise SigningCommandError.new(result.stderr) if result.exit != 0
+        raise SigningCommandError, result.stderr if result.exit != 0
         true
       end
 
@@ -54,7 +58,7 @@ module DeviceAPI
       # @param [String] apk_path full path to apk to check
       # @return returns false if the apk is unsigned, true if it is signed
       def self.is_apk_signed?(apk_path)
-        raise SigningCommandError.new('AAPT not available') unless DeviceAPI::Android::AAPT.aapt_available?
+        raise SigningCommandError, 'AAPT not available' unless DeviceAPI::Android::AAPT.aapt_available?
         result = execute("aapt list #{apk_path} | grep '^META-INF\/.*'")
         return false if result.stdout.empty?
         true
@@ -64,12 +68,12 @@ module DeviceAPI
       # @param [String] apk_path full path to the apk
       # @return [Boolean, Exception] returns true if the apk is successfully unsigned, otherwise an exception is raised
       def self.unsign_apk(apk_path)
-        raise SigningCommandError.new('AAPT not available') unless DeviceAPI::Android::AAPT.aapt_available?
+        raise SigningCommandError, 'AAPT not available' unless DeviceAPI::Android::AAPT.aapt_available?
         file_list = execute("aapt list #{apk_path} | grep '^META-INF\/.*'")
-        result = execute("aapt remove #{apk_path} #{file_list.stdout.split(/\s+/).join(' ')}")
-        raise SigningCommandError.new(result.stderr) if result.exit != 0
+        result    = execute("aapt remove #{apk_path} #{file_list.stdout.split(/\s+/).join(' ')}")
+        raise SigningCommandError, result.stderr if result.exit != 0
         true
-       end
+      end
     end
 
     # Signing error class

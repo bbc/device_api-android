@@ -1,4 +1,5 @@
 # Encoding: utf-8
+
 require 'device_api/device'
 require 'device_api/android/adb'
 require 'device_api/android/aapt'
@@ -21,29 +22,29 @@ module DeviceAPI
       end
 
       # Returns an object of the specified type, if it exists. Defaults to returning self
-      def self.create(type, options = {} )
+      def self.create(type, options = {})
         return @@subclasses[type.to_sym].new(options) if @@subclasses[type.to_sym]
-        return self.new(options)
+        new(options)
       end
 
       def initialize(options = {})
         # For devices connected with USB, qualifier and serial are same
-        @qualifier = options[:qualifier] 
+        @qualifier = options[:qualifier]
         @state = options[:state]
         @serial = options[:serial] || @qualifier
         @remote = options[:remote] ? true : false
         if is_remote?
           set_ip_and_port
-          @serial = self.serial_no if !["unknown", "offline"].include? @state
+          @serial = serial_no unless %w[unknown offline].include? @state
         end
       end
 
       def set_ip_and_port
-        address = @qualifier.split(":")
+        address = @qualifier.split(':')
         @ip_address = address.first
         @port = address.last
-      end     
- 
+      end
+
       def is_remote?
         @remote || false
       end
@@ -52,29 +53,29 @@ module DeviceAPI
       # @return (String) common status string
       def status
         {
-            'device' => :ok,
-            'no device' => :dead,
-            'offline' => :offline,
-            'unauthorized' => :unauthorized,
-            'no permissions' => :no_permissions,
-            'unknown' => :unknown
+          'device'         => :ok,
+          'no device'      => :dead,
+          'offline'        => :offline,
+          'unauthorized'   => :unauthorized,
+          'no permissions' => :no_permissions,
+          'unknown' => :unknown
         }[@state]
       end
-      
+
       def connect
         ADB.connect(@ip_address, @port)
       end
 
       def disconnect
         unless is_remote?
-          raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice.new("Asked to disconnect device #{qualifier} when it is not a remote device")
+          raise DeviceAPI::Android::DeviceDisconnectedWhenNotARemoteDevice, "Asked to disconnect device #{qualifier} when it is not a remote device"
         end
         ADB.disconnect(@ip_address, @port)
       end
 
       # Return whether device is connected or not
       def is_connected?
-        ADB.devices.any? {|device| device.include? qualifier}
+        ADB.devices.any? { |device| device.include? qualifier }
       end
 
       def display_name
@@ -135,7 +136,7 @@ module DeviceAPI
       end
 
       def block_package(package)
-        if version < "5.0.0"
+        if version < '5.0.0'
           ADB.block_package(qualifier, package)
         else
           ADB.hide_package(qualifier, package)
@@ -148,14 +149,14 @@ module DeviceAPI
         res = get_dumpsys('SurfaceOrientation')
 
         case res
-          when '0','2'
-            :portrait
-          when '1', '3'
-            :landscape
-          when nil
-            fail StandardError, 'No output returned is there a device connected?', caller
-          else
-            fail StandardError, "Device orientation not returned got: #{res}.", caller
+        when '0', '2'
+          :portrait
+        when '1', '3'
+          :landscape
+        when nil
+          raise StandardError, 'No output returned is there a device connected?', caller
+        else
+          raise StandardError, "Device orientation not returned got: #{res}.", caller
         end
       end
 
@@ -163,14 +164,14 @@ module DeviceAPI
       # @param [String] apk string containing path to the apk to install
       # @return [Symbol, Exception] :success when the apk installed successfully, otherwise an error is raised
       def install(apk)
-        fail StandardError, 'No apk specified.', caller if apk.empty?
+        raise StandardError, 'No apk specified.', caller if apk.empty?
         res = install_apk(apk)
 
         case res
-          when 'Success'
-            :success
-          else
-            fail StandardError, res, caller
+        when 'Success'
+          :success
+        else
+          raise StandardError, res, caller
         end
       end
 
@@ -180,10 +181,10 @@ module DeviceAPI
       def uninstall(package_name)
         res = uninstall_apk(package_name)
         case res
-          when 'Success'
-            :success
-          else
-            fail StandardError, "Unable to install 'package_name' Error Reported: #{res}", caller
+        when 'Success'
+          :success
+        else
+          raise StandardError, "Unable to install 'package_name' Error Reported: #{res}", caller
         end
       end
 
@@ -193,7 +194,7 @@ module DeviceAPI
       def package_name(apk)
         @apk = apk
         result = get_app_props('package')['name']
-        fail StandardError, 'Package name not found', caller if result.nil?
+        raise StandardError, 'Package name not found', caller if result.nil?
         result
       end
 
@@ -208,7 +209,7 @@ module DeviceAPI
       def app_version_number(apk)
         @apk = apk
         result = get_app_props('package')['versionName']
-        fail StandardError, 'Version number not found', caller if result.nil?
+        raise StandardError, 'Version number not found', caller if result.nil?
         result
       end
 
@@ -244,7 +245,7 @@ module DeviceAPI
       # @return [Boolean] true if the screen is on, otherwise false
       def screen_on?
         power = get_powerinfo
-        return true if power['mScreenOn'].to_s.downcase == 'true' || power['Display Power: state'].to_s.downcase == 'on'
+        return true if power['mScreenOn'].to_s.casecmp('true').zero? || power['Display Power: state'].to_s.casecmp('on').zero?
         false
       end
 
@@ -262,11 +263,7 @@ module DeviceAPI
       # Return the device type based on the DPI
       # @return [Symbol] :tablet or :mobile based upon the devices DPI
       def type
-        if get_dpi.to_i > 533
-          :tablet
-        else
-          :mobile
-        end
+        get_dpi.to_i > 533 ? :tablet : :mobile
       end
 
       # Returns wifi status and access point name
@@ -286,7 +283,7 @@ module DeviceAPI
         ADB.am(qualifier, command)
       end
 
-      #Reboots the device
+      # Reboots the device
       def reboot
         ADB.reboot(qualifier, is_remote?)
       end
@@ -305,23 +302,21 @@ module DeviceAPI
       # Returns the Wifi IP address
       def ip_address
         interface = ADB.get_network_interface(qualifier, 'wlan0')
-        if interface.match(/ip (.*) mask/)
+        if interface =~ /ip (.*) mask/
           Regexp.last_match[1]
-        elsif interface.match(/inet addr:(.*)\s+Bcast/)
+        elsif interface =~ /inet addr:(.*)\s+Bcast/
           Regexp.last_match[1].strip
-        else
-          # No match, wifi down?
         end
       end
 
       # Returns the Wifi mac address
       def wifi_mac_address
-        return ADB.get_wifi_mac_address(qualifier)
+        ADB.get_wifi_mac_address(qualifier)
       end
 
       def resolution
-       res = ADB.dumpsys(qualifier, 'window | grep mUnrestrictedScreen')
-       /^.* (.*)x(.*)$/.match(res.first)
+        res = ADB.dumpsys(qualifier, 'window | grep mUnrestrictedScreen')
+        /^.* (.*)x(.*)$/.match(res.first)
       end
 
       private
@@ -332,7 +327,7 @@ module DeviceAPI
 
       def get_disk_info
         @diskstat = DeviceAPI::Android::Plugin::Disk.new(qualifier: qualifier) unless @diskstat
-        @diskstat.process_stats      
+        @diskstat.process_stats
       end
 
       def get_battery_info
@@ -346,16 +341,12 @@ module DeviceAPI
       end
 
       def get_app_props(key)
-        unless @app_props
-          @app_props = AAPT.get_app_props(@apk)
-        end
+        @app_props = AAPT.get_app_props(@apk) unless @app_props
         @app_props.each { |x| break x[key] }
       end
 
       def get_prop(key)
-        if !@props || !@props[key]
-          @props = ADB.getprop(qualifier)
-        end
+        @props = ADB.getprop(qualifier) if !@props || !@props[key]
         @props[key]
       end
 
@@ -390,6 +381,5 @@ module DeviceAPI
         super(msg)
       end
     end
-
   end
 end
