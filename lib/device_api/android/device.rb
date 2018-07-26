@@ -35,6 +35,11 @@ module DeviceAPI
         if is_remote?
           set_ip_and_port
           @serial = self.serial_no if !["unknown", "offline"].include? @state
+          begin
+            @serial = self.serial_no
+          rescue => e
+            @serial = nil
+          end
         end
       end
 
@@ -304,6 +309,13 @@ module DeviceAPI
 
       # Returns the Wifi IP address
       def ip_address
+      # Change specifically for android tv 
+      # This is not correct implementation 
+      # Just a workaround 
+        if @ip_address
+           return @ip_address
+        end
+
         interface = ADB.get_network_interface(qualifier, 'wlan0')
         if interface.match(/ip (.*) mask/)
           Regexp.last_match[1]

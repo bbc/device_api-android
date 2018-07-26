@@ -321,6 +321,8 @@ module DeviceAPI
         # Caught here to give get_network_info consistent response
         when /^\/system\/bin\/sh: netcfg: not found/
           return result
+        when /^error: device offline/
+          raise DeviceAPI::DeviceOffline, result.stderr
         else
           raise ADBCommandError.new(result.stderr)
         end if result.exit != 0

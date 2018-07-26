@@ -63,6 +63,8 @@ module DeviceAPI
         man = Device.new(qualifier: qualifier, state: state).manufacturer
       rescue DeviceAPI::DeviceNotFound
         return :default
+      rescue DeviceAPI::DeviceOffline
+        return :default
       rescue => e
         puts "Unrecognised exception whilst finding device '#{qualifier}' (state: #{state})"
         puts e.message
